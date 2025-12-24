@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MonthKey, MONTHS } from '@/types/finance';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { MonthSelector } from '@/components/MonthSelector';
+import { YearSelector } from '@/components/YearSelector';
 import { SummaryCard } from '@/components/SummaryCard';
 import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
@@ -21,6 +22,9 @@ const Index = () => {
   });
   const {
     yearData,
+    selectedYear,
+    setSelectedYear,
+    availableYears,
     addEntry,
     removeEntry,
     addAdExpense,
@@ -70,10 +74,13 @@ const Index = () => {
           {/* Dashboard Anual */}
           <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
             <div>
-              <h2 className="section-title flex items-center gap-2">
-                <Target className="w-5 h-5 text-primary" />
-                Resumo Anual 
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="section-title flex items-center gap-2 mb-0">
+                  <Target className="w-5 h-5 text-primary" />
+                  Resumo Anual {selectedYear}
+                </h2>
+                <YearSelector selectedYear={selectedYear} availableYears={availableYears} onSelectYear={setSelectedYear} />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <SummaryCard title="Receita Total" value={annualSummary.totalRevenue} icon={<DollarSign className="w-5 h-5" />} variant="default" delay={0} />
                 <SummaryCard title="Gastos com Ads" value={annualSummary.totalAds} percentage={annualSummary.adsPercentage} icon={<TrendingDown className="w-5 h-5" />} variant="warning" delay={100} />
@@ -106,10 +113,13 @@ const Index = () => {
           <TabsContent value="monthly" className="space-y-6 animate-fade-in">
             {/* Month Selector */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <h2 className="section-title flex items-center gap-2 mb-0">
-                <Calendar className="w-5 h-5 text-primary" />
-                {currentMonthName} 2024
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="section-title flex items-center gap-2 mb-0">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  {currentMonthName} {selectedYear}
+                </h2>
+                <YearSelector selectedYear={selectedYear} availableYears={availableYears} onSelectYear={setSelectedYear} />
+              </div>
               <MonthSelector selectedMonth={selectedMonth} onSelectMonth={setSelectedMonth} />
             </div>
 
