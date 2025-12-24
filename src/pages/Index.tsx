@@ -5,39 +5,20 @@ import { MonthSelector } from '@/components/MonthSelector';
 import { SummaryCard } from '@/components/SummaryCard';
 import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
-import {
-  MonthlyBarChart,
-  MonthlyPieChart,
-  AnnualRevenueChart,
-  AnnualProfitChart,
-  AnnualComparisonChart,
-} from '@/components/Charts';
+import { MonthlyBarChart, MonthlyPieChart, AnnualRevenueChart, AnnualProfitChart, AnnualComparisonChart } from '@/components/Charts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  PieChart,
-  BarChart3,
-  Calendar,
-  Target,
-  Wallet,
-  LayoutDashboard,
-} from 'lucide-react';
-
+import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard } from 'lucide-react';
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    currency: 'BRL',
+    currency: 'BRL'
   }).format(value);
 };
-
 const Index = () => {
   const [selectedMonth, setSelectedMonth] = useState<MonthKey>(() => {
     const currentMonth = new Date().getMonth();
     return MONTHS[currentMonth].key;
   });
-
   const {
     yearData,
     addEntry,
@@ -48,15 +29,12 @@ const Index = () => {
     removeStructureCost,
     getMonthSummary,
     annualSummary,
-    getChartData,
+    getChartData
   } = useFinanceData();
-
   const monthSummary = getMonthSummary(selectedMonth);
   const monthData = yearData[selectedMonth];
-  const currentMonthName = MONTHS.find((m) => m.key === selectedMonth)?.fullName || '';
-
-  return (
-    <div className="min-h-screen bg-background">
+  const currentMonthName = MONTHS.find(m => m.key === selectedMonth)?.fullName || '';
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container py-4">
@@ -70,12 +48,7 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Gestão Financeira</p>
               </div>
             </div>
-            <TransactionForm
-              month={selectedMonth}
-              onAddEntry={(entry) => addEntry(selectedMonth, entry)}
-              onAddAdExpense={(expense) => addAdExpense(selectedMonth, expense)}
-              onAddStructureCost={(cost) => addStructureCost(selectedMonth, cost)}
-            />
+            <TransactionForm month={selectedMonth} onAddEntry={entry => addEntry(selectedMonth, entry)} onAddAdExpense={expense => addAdExpense(selectedMonth, expense)} onAddStructureCost={cost => addStructureCost(selectedMonth, cost)} />
           </div>
         </div>
       </header>
@@ -99,55 +72,15 @@ const Index = () => {
             <div>
               <h2 className="section-title flex items-center gap-2">
                 <Target className="w-5 h-5 text-primary" />
-                Resumo Anual 2024
+                Resumo Anual 
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <SummaryCard
-                  title="Receita Total"
-                  value={annualSummary.totalRevenue}
-                  icon={<DollarSign className="w-5 h-5" />}
-                  variant="default"
-                  delay={0}
-                />
-                <SummaryCard
-                  title="Gastos com Ads"
-                  value={annualSummary.totalAds}
-                  percentage={annualSummary.adsPercentage}
-                  icon={<TrendingDown className="w-5 h-5" />}
-                  variant="warning"
-                  delay={100}
-                />
-                <SummaryCard
-                  title="Custos de Estrutura"
-                  value={annualSummary.totalStructure}
-                  percentage={annualSummary.structurePercentage}
-                  icon={<PieChart className="w-5 h-5" />}
-                  variant="default"
-                  delay={200}
-                />
-                <SummaryCard
-                  title="Lucro Bruto"
-                  value={annualSummary.grossProfit}
-                  percentage={annualSummary.grossProfitPercentage}
-                  icon={<BarChart3 className="w-5 h-5" />}
-                  variant="success"
-                  delay={300}
-                />
-                <SummaryCard
-                  title="Lucro Líquido"
-                  value={annualSummary.netProfit}
-                  percentage={annualSummary.netProfitPercentage}
-                  icon={<TrendingUp className="w-5 h-5" />}
-                  variant="success"
-                  delay={400}
-                />
-                <SummaryCard
-                  title="Média Mensal de Lucro"
-                  value={annualSummary.averageMonthlyProfit}
-                  icon={<Calendar className="w-5 h-5" />}
-                  variant="success"
-                  delay={500}
-                />
+                <SummaryCard title="Receita Total" value={annualSummary.totalRevenue} icon={<DollarSign className="w-5 h-5" />} variant="default" delay={0} />
+                <SummaryCard title="Gastos com Ads" value={annualSummary.totalAds} percentage={annualSummary.adsPercentage} icon={<TrendingDown className="w-5 h-5" />} variant="warning" delay={100} />
+                <SummaryCard title="Custos de Estrutura" value={annualSummary.totalStructure} percentage={annualSummary.structurePercentage} icon={<PieChart className="w-5 h-5" />} variant="default" delay={200} />
+                <SummaryCard title="Lucro Bruto" value={annualSummary.grossProfit} percentage={annualSummary.grossProfitPercentage} icon={<BarChart3 className="w-5 h-5" />} variant="success" delay={300} />
+                <SummaryCard title="Lucro Líquido" value={annualSummary.netProfit} percentage={annualSummary.netProfitPercentage} icon={<TrendingUp className="w-5 h-5" />} variant="success" delay={400} />
+                <SummaryCard title="Média Mensal de Lucro" value={annualSummary.averageMonthlyProfit} icon={<Calendar className="w-5 h-5" />} variant="success" delay={500} />
               </div>
             </div>
 
@@ -175,47 +108,17 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 className="section-title flex items-center gap-2 mb-0">
                 <Calendar className="w-5 h-5 text-primary" />
-                {currentMonthName}
+                {currentMonthName} 2024
               </h2>
-              <MonthSelector
-                selectedMonth={selectedMonth}
-                onSelectMonth={setSelectedMonth}
-              />
+              <MonthSelector selectedMonth={selectedMonth} onSelectMonth={setSelectedMonth} />
             </div>
 
             {/* Monthly Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <SummaryCard
-                title="Receita do Mês"
-                value={monthSummary.totalRevenue}
-                icon={<DollarSign className="w-5 h-5" />}
-                variant="default"
-                delay={0}
-              />
-              <SummaryCard
-                title="Gastos com Ads"
-                value={monthSummary.totalAds}
-                percentage={monthSummary.adsPercentage}
-                icon={<TrendingDown className="w-5 h-5" />}
-                variant="warning"
-                delay={100}
-              />
-              <SummaryCard
-                title="Custos de Estrutura"
-                value={monthSummary.totalStructure}
-                percentage={monthSummary.structurePercentage}
-                icon={<PieChart className="w-5 h-5" />}
-                variant="default"
-                delay={200}
-              />
-              <SummaryCard
-                title="Lucro Líquido"
-                value={monthSummary.netProfit}
-                percentage={monthSummary.netProfitPercentage}
-                icon={<TrendingUp className="w-5 h-5" />}
-                variant={monthSummary.netProfit >= 0 ? 'success' : 'danger'}
-                delay={300}
-              />
+              <SummaryCard title="Receita do Mês" value={monthSummary.totalRevenue} icon={<DollarSign className="w-5 h-5" />} variant="default" delay={0} />
+              <SummaryCard title="Gastos com Ads" value={monthSummary.totalAds} percentage={monthSummary.adsPercentage} icon={<TrendingDown className="w-5 h-5" />} variant="warning" delay={100} />
+              <SummaryCard title="Custos de Estrutura" value={monthSummary.totalStructure} percentage={monthSummary.structurePercentage} icon={<PieChart className="w-5 h-5" />} variant="default" delay={200} />
+              <SummaryCard title="Lucro Líquido" value={monthSummary.netProfit} percentage={monthSummary.netProfitPercentage} icon={<TrendingUp className="w-5 h-5" />} variant={monthSummary.netProfit >= 0 ? 'success' : 'danger'} delay={300} />
             </div>
 
             {/* Monthly Charts */}
@@ -268,14 +171,7 @@ const Index = () => {
             {/* Transaction List */}
             <div className="stat-card">
               <h3 className="text-lg font-semibold mb-4">Transações de {currentMonthName}</h3>
-              <TransactionList
-                entries={monthData.entries}
-                adExpenses={monthData.adExpenses}
-                structureCosts={monthData.structureCosts}
-                onRemoveEntry={(id) => removeEntry(selectedMonth, id)}
-                onRemoveAdExpense={(id) => removeAdExpense(selectedMonth, id)}
-                onRemoveStructureCost={(id) => removeStructureCost(selectedMonth, id)}
-              />
+              <TransactionList entries={monthData.entries} adExpenses={monthData.adExpenses} structureCosts={monthData.structureCosts} onRemoveEntry={id => removeEntry(selectedMonth, id)} onRemoveAdExpense={id => removeAdExpense(selectedMonth, id)} onRemoveStructureCost={id => removeStructureCost(selectedMonth, id)} />
             </div>
           </TabsContent>
         </Tabs>
@@ -287,8 +183,6 @@ const Index = () => {
           <p>X1 Finance • Gestão Financeira para Vendas X1 via WhatsApp</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
