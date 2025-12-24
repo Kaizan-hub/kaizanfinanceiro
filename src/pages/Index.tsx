@@ -175,7 +175,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 className="section-title flex items-center gap-2 mb-0">
                 <Calendar className="w-5 h-5 text-primary" />
-                {currentMonthName} 2024
+                {currentMonthName}
               </h2>
               <MonthSelector
                 selectedMonth={selectedMonth}
