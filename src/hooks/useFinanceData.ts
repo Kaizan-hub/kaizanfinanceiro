@@ -10,6 +10,7 @@ import {
 } from '@/types/finance';
 
 type YearData = Record<MonthKey, MonthData>;
+type AllData = Record<number, YearData>;
 
 const createEmptyMonthData = (): MonthData => ({
   entries: [],
@@ -27,103 +28,151 @@ const createInitialYearData = (): YearData => {
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
+const STORAGE_KEY = 'financeDataAll';
+
 export const useFinanceData = () => {
-  const [yearData, setYearData] = useState<YearData>(() => {
-    const saved = localStorage.getItem('financeData2024');
-    return saved ? JSON.parse(saved) : createInitialYearData();
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  
+  const [allData, setAllData] = useState<AllData>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    // Migrate from old format if exists
+    const oldData = localStorage.getItem('financeData2024');
+    if (oldData) {
+      const migrated = { 2024: JSON.parse(oldData) };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+      localStorage.removeItem('financeData2024');
+      return migrated;
+    }
+    return { [currentYear]: createInitialYearData() };
   });
 
-  const saveData = useCallback((data: YearData) => {
-    localStorage.setItem('financeData2024', JSON.stringify(data));
-    setYearData(data);
+  const yearData = useMemo(() => {
+    return allData[selectedYear] || createInitialYearData();
+  }, [allData, selectedYear]);
+
+  const saveData = useCallback((data: AllData) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setAllData(data);
+  }, []);
+
+  const ensureYearExists = useCallback((year: number, data: AllData): AllData => {
+    if (!data[year]) {
+      return { ...data, [year]: createInitialYearData() };
+    }
+    return data;
   }, []);
 
   // Entry operations
   const addEntry = useCallback((month: MonthKey, entry: Omit<Entry, 'id'>) => {
-    setYearData(prev => {
-      const newData = {
-        ...prev,
-        [month]: {
-          ...prev[month],
-          entries: [...prev[month].entries, { ...entry, id: generateId() }],
+    setAllData(prev => {
+      let newData = ensureYearExists(selectedYear, prev);
+      newData = {
+        ...newData,
+        [selectedYear]: {
+          ...newData[selectedYear],
+          [month]: {
+            ...newData[selectedYear][month],
+            entries: [...newData[selectedYear][month].entries, { ...entry, id: generateId() }],
+          },
         },
       };
       saveData(newData);
       return newData;
     });
-  }, [saveData]);
+  }, [saveData, selectedYear, ensureYearExists]);
 
   const removeEntry = useCallback((month: MonthKey, id: string) => {
-    setYearData(prev => {
+    setAllData(prev => {
       const newData = {
         ...prev,
-        [month]: {
-          ...prev[month],
-          entries: prev[month].entries.filter(e => e.id !== id),
+        [selectedYear]: {
+          ...prev[selectedYear],
+          [month]: {
+            ...prev[selectedYear][month],
+            entries: prev[selectedYear][month].entries.filter(e => e.id !== id),
+          },
         },
       };
       saveData(newData);
       return newData;
     });
-  }, [saveData]);
+  }, [saveData, selectedYear]);
 
   // Ad expense operations
   const addAdExpense = useCallback((month: MonthKey, expense: Omit<AdExpense, 'id'>) => {
-    setYearData(prev => {
-      const newData = {
-        ...prev,
-        [month]: {
-          ...prev[month],
-          adExpenses: [...prev[month].adExpenses, { ...expense, id: generateId() }],
+    setAllData(prev => {
+      let newData = ensureYearExists(selectedYear, prev);
+      newData = {
+        ...newData,
+        [selectedYear]: {
+          ...newData[selectedYear],
+          [month]: {
+            ...newData[selectedYear][month],
+            adExpenses: [...newData[selectedYear][month].adExpenses, { ...expense, id: generateId() }],
+          },
         },
       };
       saveData(newData);
       return newData;
     });
-  }, [saveData]);
+  }, [saveData, selectedYear, ensureYearExists]);
 
   const removeAdExpense = useCallback((month: MonthKey, id: string) => {
-    setYearData(prev => {
+    setAllData(prev => {
       const newData = {
         ...prev,
-        [month]: {
-          ...prev[month],
-          adExpenses: prev[month].adExpenses.filter(e => e.id !== id),
+        [selectedYear]: {
+          ...prev[selectedYear],
+          [month]: {
+            ...prev[selectedYear][month],
+            adExpenses: prev[selectedYear][month].adExpenses.filter(e => e.id !== id),
+          },
         },
       };
       saveData(newData);
       return newData;
     });
-  }, [saveData]);
+  }, [saveData, selectedYear]);
 
   // Structure cost operations
   const addStructureCost = useCallback((month: MonthKey, cost: Omit<StructureCost, 'id'>) => {
-    setYearData(prev => {
-      const newData = {
-        ...prev,
-        [month]: {
-          ...prev[month],
-          structureCosts: [...prev[month].structureCosts, { ...cost, id: generateId() }],
+    setAllData(prev => {
+      let newData = ensureYearExists(selectedYear, prev);
+      newData = {
+        ...newData,
+        [selectedYear]: {
+          ...newData[selectedYear],
+          [month]: {
+            ...newData[selectedYear][month],
+            structureCosts: [...newData[selectedYear][month].structureCosts, { ...cost, id: generateId() }],
+          },
         },
       };
       saveData(newData);
       return newData;
     });
-  }, [saveData]);
+  }, [saveData, selectedYear, ensureYearExists]);
 
   const removeStructureCost = useCallback((month: MonthKey, id: string) => {
-    setYearData(prev => {
+    setAllData(prev => {
       const newData = {
         ...prev,
-        [month]: {
-          ...prev[month],
-          structureCosts: prev[month].structureCosts.filter(c => c.id !== id),
+        [selectedYear]: {
+          ...prev[selectedYear],
+          [month]: {
+            ...prev[selectedYear][month],
+            structureCosts: prev[selectedYear][month].structureCosts.filter(c => c.id !== id),
+          },
         },
       };
       saveData(newData);
       return newData;
     });
-  }, [saveData]);
+  }, [saveData, selectedYear]);
 
   // Calculate monthly summary
   const getMonthSummary = useCallback((month: MonthKey): MonthSummary => {
@@ -199,8 +248,21 @@ export const useFinanceData = () => {
     });
   }, [getMonthSummary]);
 
+  // Get available years
+  const availableYears = useMemo(() => {
+    const years = Object.keys(allData).map(Number).sort((a, b) => b - a);
+    if (!years.includes(currentYear)) {
+      years.unshift(currentYear);
+      years.sort((a, b) => b - a);
+    }
+    return years;
+  }, [allData, currentYear]);
+
   return {
     yearData,
+    selectedYear,
+    setSelectedYear,
+    availableYears,
     addEntry,
     removeEntry,
     addAdExpense,
