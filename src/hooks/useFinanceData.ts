@@ -1,4 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   MonthData, 
   MonthKey, 
@@ -8,9 +10,9 @@ import {
   MonthSummary,
   MONTHS 
 } from '@/types/finance';
+import { useToast } from '@/hooks/use-toast';
 
 type YearData = Record<MonthKey, MonthData>;
-type AllData = Record<number, YearData>;
 
 const createEmptyMonthData = (): MonthData => ({
   entries: [],
@@ -26,153 +28,368 @@ const createInitialYearData = (): YearData => {
   return data;
 };
 
-const generateId = () => Math.random().toString(36).substring(2, 9);
-
-const STORAGE_KEY = 'financeDataAll';
+const getMonthFromDate = (dateString: string): MonthKey => {
+  const date = new Date(dateString);
+  const monthIndex = date.getMonth();
+  return MONTHS[monthIndex].key;
+};
 
 export const useFinanceData = () => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  
-  const [allData, setAllData] = useState<AllData>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    // Migrate from old format if exists
-    const oldData = localStorage.getItem('financeData2024');
-    if (oldData) {
-      const migrated = { 2024: JSON.parse(oldData) };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-      localStorage.removeItem('financeData2024');
-      return migrated;
-    }
-    return { [currentYear]: createInitialYearData() };
-  });
+  const [yearData, setYearData] = useState<YearData>(createInitialYearData());
+  const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const yearData = useMemo(() => {
-    return allData[selectedYear] || createInitialYearData();
-  }, [allData, selectedYear]);
-
-  const saveData = useCallback((data: AllData) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    setAllData(data);
-  }, []);
-
-  const ensureYearExists = useCallback((year: number, data: AllData): AllData => {
-    if (!data[year]) {
-      return { ...data, [year]: createInitialYearData() };
+  // Fetch data from database
+  const fetchData = useCallback(async () => {
+    if (!user) {
+      setYearData(createInitialYearData());
+      setLoading(false);
+      return;
     }
-    return data;
-  }, []);
+
+    setLoading(true);
+    try {
+      const [entriesRes, adExpensesRes, structureCostsRes] = await Promise.all([
+        supabase.from('entries').select('*').eq('user_id', user.id).eq('year', selectedYear),
+        supabase.from('ad_expenses').select('*').eq('user_id', user.id).eq('year', selectedYear),
+        supabase.from('structure_costs').select('*').eq('user_id', user.id).eq('year', selectedYear),
+      ]);
+
+      if (entriesRes.error) throw entriesRes.error;
+      if (adExpensesRes.error) throw adExpensesRes.error;
+      if (structureCostsRes.error) throw structureCostsRes.error;
+
+      const newYearData = createInitialYearData();
+
+      // Organize entries by month
+      entriesRes.data?.forEach((entry) => {
+        const month = getMonthFromDate(entry.date);
+        newYearData[month].entries.push({
+          id: entry.id,
+          date: entry.date,
+          value: Number(entry.value),
+          origin: entry.origin,
+          observation: entry.observation || undefined,
+        });
+      });
+
+      // Organize ad expenses by month
+      adExpensesRes.data?.forEach((expense) => {
+        const month = getMonthFromDate(expense.date);
+        newYearData[month].adExpenses.push({
+          id: expense.id,
+          date: expense.date,
+          platform: expense.platform as AdExpense['platform'],
+          value: Number(expense.value),
+          observation: expense.observation || undefined,
+        });
+      });
+
+      // Organize structure costs by month
+      structureCostsRes.data?.forEach((cost) => {
+        const month = getMonthFromDate(cost.date);
+        newYearData[month].structureCosts.push({
+          id: cost.id,
+          date: cost.date,
+          category: cost.category as StructureCost['category'],
+          value: Number(cost.value),
+          isRecurring: cost.is_recurring,
+          observation: cost.observation || undefined,
+        });
+      });
+
+      setYearData(newYearData);
+
+      // Fetch available years
+      const yearsRes = await supabase
+        .from('entries')
+        .select('year')
+        .eq('user_id', user.id);
+      
+      const adYearsRes = await supabase
+        .from('ad_expenses')
+        .select('year')
+        .eq('user_id', user.id);
+      
+      const structureYearsRes = await supabase
+        .from('structure_costs')
+        .select('year')
+        .eq('user_id', user.id);
+
+      const allYears = new Set<number>([currentYear]);
+      yearsRes.data?.forEach(r => allYears.add(r.year));
+      adYearsRes.data?.forEach(r => allYears.add(r.year));
+      structureYearsRes.data?.forEach(r => allYears.add(r.year));
+      
+      setAvailableYears(Array.from(allYears).sort((a, b) => b - a));
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar os dados.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [user, selectedYear, currentYear, toast]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Entry operations
-  const addEntry = useCallback((month: MonthKey, entry: Omit<Entry, 'id'>) => {
-    setAllData(prev => {
-      let newData = ensureYearExists(selectedYear, prev);
-      newData = {
-        ...newData,
-        [selectedYear]: {
-          ...newData[selectedYear],
-          [month]: {
-            ...newData[selectedYear][month],
-            entries: [...newData[selectedYear][month].entries, { ...entry, id: generateId() }],
-          },
-        },
-      };
-      saveData(newData);
-      return newData;
-    });
-  }, [saveData, selectedYear, ensureYearExists]);
+  const addEntry = useCallback(async (month: MonthKey, entry: Omit<Entry, 'id'>) => {
+    if (!user) return;
 
-  const removeEntry = useCallback((month: MonthKey, id: string) => {
-    setAllData(prev => {
-      const newData = {
+    try {
+      const { data, error } = await supabase
+        .from('entries')
+        .insert({
+          user_id: user.id,
+          date: entry.date,
+          value: entry.value,
+          origin: entry.origin,
+          observation: entry.observation || null,
+          year: selectedYear,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setYearData(prev => ({
         ...prev,
-        [selectedYear]: {
-          ...prev[selectedYear],
-          [month]: {
-            ...prev[selectedYear][month],
-            entries: prev[selectedYear][month].entries.filter(e => e.id !== id),
-          },
+        [month]: {
+          ...prev[month],
+          entries: [...prev[month].entries, {
+            id: data.id,
+            date: data.date,
+            value: Number(data.value),
+            origin: data.origin,
+            observation: data.observation || undefined,
+          }],
         },
-      };
-      saveData(newData);
-      return newData;
-    });
-  }, [saveData, selectedYear]);
+      }));
+
+      toast({
+        title: 'Sucesso',
+        description: 'Entrada adicionada com sucesso!',
+      });
+    } catch (error) {
+      console.error('Error adding entry:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar a entrada.',
+        variant: 'destructive',
+      });
+    }
+  }, [user, selectedYear, toast]);
+
+  const removeEntry = useCallback(async (month: MonthKey, id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('entries')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setYearData(prev => ({
+        ...prev,
+        [month]: {
+          ...prev[month],
+          entries: prev[month].entries.filter(e => e.id !== id),
+        },
+      }));
+
+      toast({
+        title: 'Sucesso',
+        description: 'Entrada removida com sucesso!',
+      });
+    } catch (error) {
+      console.error('Error removing entry:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível remover a entrada.',
+        variant: 'destructive',
+      });
+    }
+  }, [user, toast]);
 
   // Ad expense operations
-  const addAdExpense = useCallback((month: MonthKey, expense: Omit<AdExpense, 'id'>) => {
-    setAllData(prev => {
-      let newData = ensureYearExists(selectedYear, prev);
-      newData = {
-        ...newData,
-        [selectedYear]: {
-          ...newData[selectedYear],
-          [month]: {
-            ...newData[selectedYear][month],
-            adExpenses: [...newData[selectedYear][month].adExpenses, { ...expense, id: generateId() }],
-          },
-        },
-      };
-      saveData(newData);
-      return newData;
-    });
-  }, [saveData, selectedYear, ensureYearExists]);
+  const addAdExpense = useCallback(async (month: MonthKey, expense: Omit<AdExpense, 'id'>) => {
+    if (!user) return;
 
-  const removeAdExpense = useCallback((month: MonthKey, id: string) => {
-    setAllData(prev => {
-      const newData = {
+    try {
+      const { data, error } = await supabase
+        .from('ad_expenses')
+        .insert({
+          user_id: user.id,
+          date: expense.date,
+          platform: expense.platform,
+          value: expense.value,
+          observation: expense.observation || null,
+          year: selectedYear,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setYearData(prev => ({
         ...prev,
-        [selectedYear]: {
-          ...prev[selectedYear],
-          [month]: {
-            ...prev[selectedYear][month],
-            adExpenses: prev[selectedYear][month].adExpenses.filter(e => e.id !== id),
-          },
+        [month]: {
+          ...prev[month],
+          adExpenses: [...prev[month].adExpenses, {
+            id: data.id,
+            date: data.date,
+            platform: data.platform,
+            value: Number(data.value),
+            observation: data.observation || undefined,
+          }],
         },
-      };
-      saveData(newData);
-      return newData;
-    });
-  }, [saveData, selectedYear]);
+      }));
+
+      toast({
+        title: 'Sucesso',
+        description: 'Gasto com Ads adicionado com sucesso!',
+      });
+    } catch (error) {
+      console.error('Error adding ad expense:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar o gasto com Ads.',
+        variant: 'destructive',
+      });
+    }
+  }, [user, selectedYear, toast]);
+
+  const removeAdExpense = useCallback(async (month: MonthKey, id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('ad_expenses')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setYearData(prev => ({
+        ...prev,
+        [month]: {
+          ...prev[month],
+          adExpenses: prev[month].adExpenses.filter(e => e.id !== id),
+        },
+      }));
+
+      toast({
+        title: 'Sucesso',
+        description: 'Gasto com Ads removido com sucesso!',
+      });
+    } catch (error) {
+      console.error('Error removing ad expense:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível remover o gasto com Ads.',
+        variant: 'destructive',
+      });
+    }
+  }, [user, toast]);
 
   // Structure cost operations
-  const addStructureCost = useCallback((month: MonthKey, cost: Omit<StructureCost, 'id'>) => {
-    setAllData(prev => {
-      let newData = ensureYearExists(selectedYear, prev);
-      newData = {
-        ...newData,
-        [selectedYear]: {
-          ...newData[selectedYear],
-          [month]: {
-            ...newData[selectedYear][month],
-            structureCosts: [...newData[selectedYear][month].structureCosts, { ...cost, id: generateId() }],
-          },
-        },
-      };
-      saveData(newData);
-      return newData;
-    });
-  }, [saveData, selectedYear, ensureYearExists]);
+  const addStructureCost = useCallback(async (month: MonthKey, cost: Omit<StructureCost, 'id'>) => {
+    if (!user) return;
 
-  const removeStructureCost = useCallback((month: MonthKey, id: string) => {
-    setAllData(prev => {
-      const newData = {
+    try {
+      const { data, error } = await supabase
+        .from('structure_costs')
+        .insert({
+          user_id: user.id,
+          date: cost.date,
+          category: cost.category,
+          value: cost.value,
+          is_recurring: cost.isRecurring,
+          observation: cost.observation || null,
+          year: selectedYear,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setYearData(prev => ({
         ...prev,
-        [selectedYear]: {
-          ...prev[selectedYear],
-          [month]: {
-            ...prev[selectedYear][month],
-            structureCosts: prev[selectedYear][month].structureCosts.filter(c => c.id !== id),
-          },
+        [month]: {
+          ...prev[month],
+          structureCosts: [...prev[month].structureCosts, {
+            id: data.id,
+            date: data.date,
+            category: data.category,
+            value: Number(data.value),
+            isRecurring: data.is_recurring,
+            observation: data.observation || undefined,
+          }],
         },
-      };
-      saveData(newData);
-      return newData;
-    });
-  }, [saveData, selectedYear]);
+      }));
+
+      toast({
+        title: 'Sucesso',
+        description: 'Custo de estrutura adicionado com sucesso!',
+      });
+    } catch (error) {
+      console.error('Error adding structure cost:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar o custo de estrutura.',
+        variant: 'destructive',
+      });
+    }
+  }, [user, selectedYear, toast]);
+
+  const removeStructureCost = useCallback(async (month: MonthKey, id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('structure_costs')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setYearData(prev => ({
+        ...prev,
+        [month]: {
+          ...prev[month],
+          structureCosts: prev[month].structureCosts.filter(c => c.id !== id),
+        },
+      }));
+
+      toast({
+        title: 'Sucesso',
+        description: 'Custo de estrutura removido com sucesso!',
+      });
+    } catch (error) {
+      console.error('Error removing structure cost:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível remover o custo de estrutura.',
+        variant: 'destructive',
+      });
+    }
+  }, [user, toast]);
 
   // Calculate monthly summary
   const getMonthSummary = useCallback((month: MonthKey): MonthSummary => {
@@ -248,21 +465,12 @@ export const useFinanceData = () => {
     });
   }, [getMonthSummary]);
 
-  // Get available years
-  const availableYears = useMemo(() => {
-    const years = Object.keys(allData).map(Number).sort((a, b) => b - a);
-    if (!years.includes(currentYear)) {
-      years.unshift(currentYear);
-      years.sort((a, b) => b - a);
-    }
-    return years;
-  }, [allData, currentYear]);
-
   return {
     yearData,
     selectedYear,
     setSelectedYear,
     availableYears,
+    loading,
     addEntry,
     removeEntry,
     addAdExpense,
