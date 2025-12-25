@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MonthKey, MONTHS } from '@/types/finance';
 import { useFinanceData } from '@/hooks/useFinanceData';
+import { useAuth } from '@/contexts/AuthContext';
 import { MonthSelector } from '@/components/MonthSelector';
 import { YearSelector } from '@/components/YearSelector';
 import { SummaryCard } from '@/components/SummaryCard';
@@ -8,7 +9,8 @@ import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
 import { MonthlyBarChart, MonthlyPieChart, AnnualRevenueChart, AnnualProfitChart, AnnualComparisonChart } from '@/components/Charts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2 } from 'lucide-react';
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -20,11 +22,13 @@ const Index = () => {
     const currentMonth = new Date().getMonth();
     return MONTHS[currentMonth].key;
   });
+  const { signOut } = useAuth();
   const {
     yearData,
     selectedYear,
     setSelectedYear,
     availableYears,
+    loading,
     addEntry,
     removeEntry,
     addAdExpense,
@@ -35,6 +39,18 @@ const Index = () => {
     annualSummary,
     getChartData
   } = useFinanceData();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   const monthSummary = getMonthSummary(selectedMonth);
   const monthData = yearData[selectedMonth];
   const currentMonthName = MONTHS.find(m => m.key === selectedMonth)?.fullName || '';
@@ -52,7 +68,12 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Gestão Financeira</p>
               </div>
             </div>
-            <TransactionForm month={selectedMonth} onAddEntry={entry => addEntry(selectedMonth, entry)} onAddAdExpense={expense => addAdExpense(selectedMonth, expense)} onAddStructureCost={cost => addStructureCost(selectedMonth, cost)} />
+            <div className="flex items-center gap-2">
+              <TransactionForm month={selectedMonth} onAddEntry={entry => addEntry(selectedMonth, entry)} onAddAdExpense={expense => addAdExpense(selectedMonth, expense)} onAddStructureCost={cost => addStructureCost(selectedMonth, cost)} />
+              <Button variant="outline" size="icon" onClick={handleSignOut} title="Sair">
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>

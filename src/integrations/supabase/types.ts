@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ad_expenses: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          observation: string | null
+          platform: string
+          user_id: string
+          value: number
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          observation?: string | null
+          platform: string
+          user_id: string
+          value: number
+          year: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          observation?: string | null
+          platform?: string
+          user_id?: string
+          value?: number
+          year?: number
+        }
+        Relationships: []
+      }
+      entries: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          observation: string | null
+          origin: string
+          user_id: string
+          value: number
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          observation?: string | null
+          origin?: string
+          user_id: string
+          value: number
+          year: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          observation?: string | null
+          origin?: string
+          user_id?: string
+          value?: number
+          year?: number
+        }
+        Relationships: []
+      }
+      structure_costs: {
+        Row: {
+          category: string
+          created_at: string
+          date: string
+          id: string
+          is_recurring: boolean
+          observation: string | null
+          user_id: string
+          value: number
+          year: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          date: string
+          id?: string
+          is_recurring?: boolean
+          observation?: string | null
+          user_id: string
+          value: number
+          year: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          is_recurring?: boolean
+          observation?: string | null
+          user_id?: string
+          value?: number
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
