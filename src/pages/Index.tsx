@@ -8,9 +8,10 @@ import { SummaryCard } from '@/components/SummaryCard';
 import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
 import { MonthlyBarChart, MonthlyPieChart, AnnualRevenueChart, AnnualProfitChart, AnnualComparisonChart } from '@/components/Charts';
+import { ProductivityTab } from '@/components/productivity/ProductivityTab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2 } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2, Clock } from 'lucide-react';
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -89,6 +90,10 @@ const Index = () => {
             <TabsTrigger value="monthly" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Calendar className="w-4 h-4" />
               Visão Mensal
+            </TabsTrigger>
+            <TabsTrigger value="productivity" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Clock className="w-4 h-4" />
+              Ponto & Produtividade
             </TabsTrigger>
           </TabsList>
 
@@ -204,6 +209,11 @@ const Index = () => {
               <h3 className="text-lg font-semibold mb-4">Transações de {currentMonthName}</h3>
               <TransactionList entries={monthData.entries} adExpenses={monthData.adExpenses} structureCosts={monthData.structureCosts} onRemoveEntry={id => removeEntry(selectedMonth, id)} onRemoveAdExpense={id => removeAdExpense(selectedMonth, id)} onRemoveStructureCost={id => removeStructureCost(selectedMonth, id)} />
             </div>
+          </TabsContent>
+
+          {/* Ponto & Produtividade */}
+          <TabsContent value="productivity" className="animate-fade-in">
+            <ProductivityTab />
           </TabsContent>
         </Tabs>
       </main>
