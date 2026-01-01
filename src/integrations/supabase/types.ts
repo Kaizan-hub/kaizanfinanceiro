@@ -116,6 +116,45 @@ export type Database = {
         }
         Relationships: []
       }
+      time_records: {
+        Row: {
+          break_end: string | null
+          break_start: string | null
+          created_at: string
+          date: string
+          entry_time: string | null
+          exit_time: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          break_end?: string | null
+          break_start?: string | null
+          created_at?: string
+          date: string
+          entry_time?: string | null
+          exit_time?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          break_end?: string | null
+          break_start?: string | null
+          created_at?: string
+          date?: string
+          entry_time?: string | null
+          exit_time?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
