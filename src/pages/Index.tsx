@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MonthKey, MONTHS } from '@/types/finance';
 import { useFinanceData } from '@/hooks/useFinanceData';
+import { useProfitGoals } from '@/hooks/useProfitGoals';
 import { useAuth } from '@/contexts/AuthContext';
 import { MonthSelector } from '@/components/MonthSelector';
 import { YearSelector } from '@/components/YearSelector';
@@ -9,6 +10,8 @@ import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
 import { MonthlyBarChart, MonthlyPieChart, AnnualRevenueChart, AnnualProfitChart, AnnualComparisonChart } from '@/components/Charts';
 import { ProductivityTab } from '@/components/productivity/ProductivityTab';
+import { MonthlyGoalBar } from '@/components/goals/MonthlyGoalBar';
+import { AnnualGoalBar } from '@/components/goals/AnnualGoalBar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2, Clock } from 'lucide-react';
@@ -40,6 +43,13 @@ const Index = () => {
     annualSummary,
     getChartData
   } = useFinanceData();
+
+  const {
+    getAdjustedGoals,
+    annualProgress,
+    updateMonthlyGoal,
+    updateAnnualGoal,
+  } = useProfitGoals(selectedYear, getMonthSummary);
 
   const handleSignOut = async () => {
     await signOut();
@@ -117,7 +127,16 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Annual Charts */}
+            {/* Annual Goal Progress Bar */}
+            <AnnualGoalBar
+              totalNetProfit={annualProgress.totalNetProfit}
+              annualGoal={annualProgress.annualGoal}
+              remaining={annualProgress.remaining}
+              exceeded={annualProgress.exceeded}
+              percentage={annualProgress.percentage}
+              isAchieved={annualProgress.isAchieved}
+              onUpdateGoal={updateAnnualGoal}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="stat-card">
                 <h3 className="text-lg font-semibold mb-4">Evolução da Receita</h3>
@@ -157,7 +176,21 @@ const Index = () => {
               <SummaryCard title="Lucro Líquido" value={monthSummary.netProfit} percentage={monthSummary.netProfitPercentage} icon={<TrendingUp className="w-5 h-5" />} variant={monthSummary.netProfit >= 0 ? 'success' : 'danger'} delay={300} />
             </div>
 
-            {/* Monthly Charts */}
+            {/* Monthly Goal Progress Bar */}
+            {getAdjustedGoals[selectedMonth] && (
+              <MonthlyGoalBar
+                month={selectedMonth}
+                adjustedGoal={getAdjustedGoals[selectedMonth].adjustedGoal}
+                actualProfit={getAdjustedGoals[selectedMonth].actualProfit}
+                remaining={getAdjustedGoals[selectedMonth].remaining}
+                exceeded={getAdjustedGoals[selectedMonth].exceeded}
+                percentage={getAdjustedGoals[selectedMonth].percentage}
+                isAchieved={getAdjustedGoals[selectedMonth].isAchieved}
+                carryOver={getAdjustedGoals[selectedMonth].carryOver}
+                onUpdateGoal={updateMonthlyGoal}
+                baseGoal={getAdjustedGoals[selectedMonth].baseGoal}
+              />
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="stat-card">
                 <h3 className="text-lg font-semibold mb-4">Visão Geral</h3>
