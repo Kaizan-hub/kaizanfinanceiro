@@ -47,6 +47,33 @@ export type Database = {
         }
         Relationships: []
       }
+      annual_goals: {
+        Row: {
+          created_at: string
+          id: string
+          target_value: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_value?: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_value?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       entries: {
         Row: {
           created_at: string
@@ -76,6 +103,36 @@ export type Database = {
           origin?: string
           user_id?: string
           value?: number
+          year?: number
+        }
+        Relationships: []
+      }
+      profit_goals: {
+        Row: {
+          created_at: string
+          id: string
+          month: string
+          target_value: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: string
+          target_value?: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: string
+          target_value?: number
+          updated_at?: string
+          user_id?: string
           year?: number
         }
         Relationships: []
