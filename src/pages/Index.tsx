@@ -91,19 +91,19 @@ const Index = () => {
 
       <main className="container py-6 space-y-6">
         {/* Main Tabs */}
-        <Tabs defaultValue="dashboard" className="space-y-6">
+        <Tabs defaultValue="productivity" className="space-y-6">
           <TabsList className="bg-secondary/50 p-1">
-            <TabsTrigger value="dashboard" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard Anual
+            <TabsTrigger value="productivity" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Clock className="w-4 h-4" />
+              Ponto & Produtividade
             </TabsTrigger>
             <TabsTrigger value="monthly" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Calendar className="w-4 h-4" />
               Visão Mensal
             </TabsTrigger>
-            <TabsTrigger value="productivity" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Clock className="w-4 h-4" />
-              Ponto & Produtividade
+            <TabsTrigger value="dashboard" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard Anual
             </TabsTrigger>
           </TabsList>
 
