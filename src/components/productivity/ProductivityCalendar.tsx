@@ -94,7 +94,6 @@ export const ProductivityCalendar = ({
           const dayNumber = parseInt(day.date.split('-')[2]);
           const isSelected = day.date === selectedDate;
           const isToday = day.date === today;
-          const isWeekend = new Date(day.date).getDay() === 0 || new Date(day.date).getDay() === 6;
           const isFuture = new Date(day.date) > new Date();
 
           return (
@@ -106,11 +105,11 @@ export const ProductivityCalendar = ({
                 'hover:ring-2 hover:ring-primary/50',
                 isSelected && 'ring-2 ring-primary',
                 isToday && 'font-bold',
-                (isWeekend || isFuture) && 'opacity-50'
+                isFuture && 'opacity-50'
               )}
             >
               <span className="text-foreground">{dayNumber}</span>
-              {!isWeekend && !isFuture && (
+              {!isFuture && (
                 <div className="flex gap-0.5">
                   {day.record?.entry_time && (
                     <span className={cn('w-1.5 h-1.5 rounded-full', getStatusColor(day.status))}></span>
@@ -126,7 +125,7 @@ export const ProductivityCalendar = ({
                   )}
                 </div>
               )}
-              {!isWeekend && !isFuture && !day.record?.entry_time && day.status === 'absent' && (
+              {!isFuture && !day.record?.entry_time && day.status === 'absent' && (
                 <span className="w-3 h-3 rounded-full bg-destructive flex items-center justify-center">
                   <span className="text-[8px] text-destructive-foreground font-bold">!</span>
                 </span>
