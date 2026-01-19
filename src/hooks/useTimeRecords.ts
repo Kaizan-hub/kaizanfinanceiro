@@ -110,7 +110,7 @@ export const useTimeRecords = () => {
 
     if (!record || !record.entry_time) {
       // Only mark as absent if the date has passed
-      if (recordDate < today && recordDate.getDay() !== 0 && recordDate.getDay() !== 6) {
+      if (recordDate < today) {
         return 'absent';
       }
       return 'incomplete';
