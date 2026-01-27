@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
-import { Trophy, TrendingUp, Zap, Target, Sparkles } from 'lucide-react';
+import { Crown, Target as TargetIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 
 interface RecordChallengeCardProps {
   currentProfit: number;
@@ -23,8 +22,9 @@ export const RecordChallengeCard = ({
 }: RecordChallengeCardProps) => {
   const isNewRecord = currentProfit > recordProfit && currentProfit > 0;
   const progressPercentage = recordProfit > 0 
-    ? Math.min((currentProfit / recordProfit) * 100, 150) 
+    ? Math.min((currentProfit / recordProfit) * 100, 100) 
     : 0;
+  const amountToRecord = Math.max(recordProfit - currentProfit, 0);
 
   return (
     <motion.div
@@ -32,43 +32,32 @@ export const RecordChallengeCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <Card className={cn(
-        "stat-card overflow-hidden",
-        isNewRecord && "border-primary bg-primary/5"
-      )}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-bold flex items-center gap-2">
-            <Trophy className={cn(
-              "w-5 h-5",
-              isNewRecord ? "text-primary fill-primary/20" : "text-muted-foreground"
-            )} />
-            Desafio do Recorde
-            {isNewRecord && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="ml-auto"
-              >
-                <Sparkles className="w-5 h-5 text-primary" />
-              </motion.span>
-            )}
-          </CardTitle>
+      <Card className="stat-card overflow-hidden border-2 border-border/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
+              <Crown className="w-5 h-5 text-warning" />
+              Desafio do Recorde
+            </CardTitle>
+            <TargetIcon className="w-5 h-5 text-muted-foreground" />
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Current vs Record */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Current vs Record - Side by Side */}
+          <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Lucro Atual</p>
-              <p className={cn(
-                "text-xl font-bold",
-                currentProfit >= 0 ? "text-success" : "text-destructive"
-              )}>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                LUCRO HOJE
+              </p>
+              <p className={`text-2xl font-bold ${currentProfit >= 0 ? 'text-success' : 'text-destructive'}`}>
                 {formatCurrency(currentProfit)}
               </p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Recorde Histórico</p>
-              <p className="text-xl font-bold text-primary">
+            <div className="text-right">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                MELHOR DIA
+              </p>
+              <p className="text-2xl font-bold text-foreground">
                 {formatCurrency(recordProfit)}
               </p>
               {recordDate && (
@@ -77,45 +66,43 @@ export const RecordChallengeCard = ({
             </div>
           </div>
 
-          {/* Progress Bar */}
+          {/* Progress Section */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Progresso até o recorde</span>
-              <span className={cn(
-                "font-semibold",
-                isNewRecord ? "text-primary" : "text-muted-foreground"
-              )}>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">
+                Progresso para o recorde
+              </span>
+              <span className="text-xs font-semibold text-muted-foreground">
                 {progressPercentage.toFixed(0)}%
               </span>
             </div>
-            <div className="h-3 bg-secondary rounded-full overflow-hidden">
+            <div className="h-2 bg-secondary rounded-full overflow-hidden border border-border/50">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                animate={{ width: `${progressPercentage}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
-                className={cn(
-                  "h-full rounded-full",
+                className={`h-full rounded-full ${
                   isNewRecord 
-                    ? "bg-gradient-to-r from-primary to-warning" 
-                    : "bg-primary"
-                )}
+                    ? "bg-gradient-to-r from-success to-primary" 
+                    : "bg-success"
+                }`}
               />
             </div>
           </div>
 
-          {/* Insights Footer */}
-          <div className="flex justify-between items-center pt-2 border-t border-border">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Zap className="w-3 h-3 text-primary" />
-              <span>Ritmo</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Target className="w-3 h-3 text-success" />
-              <span>Precisão</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <TrendingUp className="w-3 h-3 text-chart-structure" />
-              <span>Clareza</span>
+          {/* Amount to Record */}
+          <div className="bg-secondary/50 rounded-lg p-3 border border-border/30">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <TargetIcon className="w-4 h-4 text-muted-foreground/70" />
+              <span>
+                {isNewRecord ? (
+                  <span className="text-success font-semibold">🎉 Novo recorde alcançado!</span>
+                ) : (
+                  <>
+                    Faltam <span className="font-bold text-foreground">{formatCurrency(amountToRecord)}</span> para bater o recorde
+                  </>
+                )}
+              </span>
             </div>
           </div>
         </CardContent>

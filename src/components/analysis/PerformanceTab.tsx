@@ -152,37 +152,53 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
                   className="gap-2 transition-all duration-200 hover:scale-105"
                 >
                   <CalendarIcon className="w-4 h-4" />
-                  Personalizado
+                  {dateFilter === 'custom' && customStartDate && customEndDate 
+                    ? `${format(customStartDate, 'dd/MM')} - ${format(customEndDate, 'dd/MM')}`
+                    : 'Personalizado'
+                  }
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-4" align="end">
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium">Data Inicial</Label>
-                    <Calendar
-                      mode="single"
-                      selected={customStartDate}
-                      onSelect={(date) => {
-                        setCustomStartDate(date);
-                        setDateFilter('custom');
-                      }}
-                      locale={ptBR}
-                      className="rounded-md border mt-1"
-                    />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Label className="text-sm font-medium">Período de Visualização</Label>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <HelpCircle className="w-3 h-3 text-muted-foreground/50" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">Clique na data inicial e depois na data final</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
-                  <div>
-                    <Label className="text-sm font-medium">Data Final</Label>
-                    <Calendar
-                      mode="single"
-                      selected={customEndDate}
-                      onSelect={(date) => {
-                        setCustomEndDate(date);
+                  
+                  {/* Display selected range */}
+                  {customStartDate && (
+                    <div className="text-xs text-muted-foreground bg-secondary/50 px-3 py-2 rounded-md border border-border/50">
+                      {customStartDate && customEndDate 
+                        ? `${format(customStartDate, 'dd/MM/yyyy')} - ${format(customEndDate, 'dd/MM/yyyy')}`
+                        : `${format(customStartDate, 'dd/MM/yyyy')} - Selecione a data final`
+                      }
+                    </div>
+                  )}
+                  
+                  <Calendar
+                    mode="range"
+                    selected={{
+                      from: customStartDate,
+                      to: customEndDate,
+                    }}
+                    onSelect={(range) => {
+                      setCustomStartDate(range?.from);
+                      setCustomEndDate(range?.to);
+                      if (range?.from) {
                         setDateFilter('custom');
-                      }}
-                      locale={ptBR}
-                      className="rounded-md border mt-1"
-                    />
-                  </div>
+                      }
+                    }}
+                    locale={ptBR}
+                    numberOfMonths={1}
+                    className="rounded-md border pointer-events-auto"
+                  />
                 </div>
               </PopoverContent>
             </Popover>
