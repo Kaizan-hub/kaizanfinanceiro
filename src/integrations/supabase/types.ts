@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       ad_expenses: {
         Row: {
+          clients_served: number | null
           created_at: string
           date: string
           id: string
@@ -26,6 +27,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          clients_served?: number | null
           created_at?: string
           date: string
           id?: string
@@ -36,6 +38,7 @@ export type Database = {
           year: number
         }
         Update: {
+          clients_served?: number | null
           created_at?: string
           date?: string
           id?: string
@@ -68,6 +71,42 @@ export type Database = {
           created_at?: string
           id?: string
           target_value?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      daily_performance_notes: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          improvement_opportunities: string | null
+          performance_rating: number | null
+          positive_points: string | null
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          improvement_opportunities?: string | null
+          performance_rating?: number | null
+          positive_points?: string | null
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          improvement_opportunities?: string | null
+          performance_rating?: number | null
+          positive_points?: string | null
           updated_at?: string
           user_id?: string
           year?: number

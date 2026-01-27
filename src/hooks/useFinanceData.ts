@@ -85,6 +85,7 @@ export const useFinanceData = () => {
           date: expense.date,
           platform: expense.platform as AdExpense['platform'],
           value: Number(expense.value),
+          clientsServed: expense.clients_served || 0,
           observation: expense.observation || undefined,
         });
       });
@@ -237,6 +238,7 @@ export const useFinanceData = () => {
           date: expense.date,
           platform: expense.platform,
           value: expense.value,
+          clients_served: expense.clientsServed || 0,
           observation: expense.observation || null,
           year: selectedYear,
         })
@@ -254,6 +256,7 @@ export const useFinanceData = () => {
             date: data.date,
             platform: data.platform,
             value: Number(data.value),
+            clientsServed: data.clients_served || 0,
             observation: data.observation || undefined,
           }],
         },

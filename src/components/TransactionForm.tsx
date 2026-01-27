@@ -25,7 +25,7 @@ import { MonthKey, PLATFORMS, STRUCTURE_TYPES } from '@/types/finance';
 interface TransactionFormProps {
   month: MonthKey;
   onAddEntry: (entry: { date: string; value: number; origin: string; observation?: string }) => void;
-  onAddAdExpense: (expense: { date: string; platform: 'Meta Ads' | 'Google Ads' | 'Outros'; value: number; observation?: string }) => void;
+  onAddAdExpense: (expense: { date: string; platform: 'Meta Ads' | 'Google Ads' | 'Outros'; value: number; clientsServed: number; observation?: string }) => void;
   onAddStructureCost: (cost: { category: 'ferramentas' | 'assinaturas' | 'plataformas' | 'outros'; date: string; value: number; isRecurring: boolean; observation?: string }) => void;
 }
 
@@ -48,6 +48,7 @@ export const TransactionForm = ({
   const [adDate, setAdDate] = useState('');
   const [adPlatform, setAdPlatform] = useState<'Meta Ads' | 'Google Ads' | 'Outros'>('Meta Ads');
   const [adValue, setAdValue] = useState('');
+  const [adClientsServed, setAdClientsServed] = useState('');
   const [adObservation, setAdObservation] = useState('');
 
   // Structure cost state
@@ -65,6 +66,7 @@ export const TransactionForm = ({
     setAdDate('');
     setAdPlatform('Meta Ads');
     setAdValue('');
+    setAdClientsServed('');
     setAdObservation('');
     setStructureType('ferramentas');
     setStructureDate('');
@@ -86,11 +88,12 @@ export const TransactionForm = ({
   };
 
   const handleAddAdExpense = () => {
-    if (!adDate || !adValue) return;
+    if (!adDate || !adValue || !adClientsServed) return;
     onAddAdExpense({
       date: adDate,
       platform: adPlatform,
       value: parseFloat(adValue),
+      clientsServed: parseInt(adClientsServed, 10),
       observation: adObservation || undefined,
     });
     resetForms();
@@ -217,6 +220,17 @@ export const TransactionForm = ({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ad-clients">Clientes Atendidos *</Label>
+              <Input
+                id="ad-clients"
+                type="number"
+                placeholder="0"
+                min="0"
+                value={adClientsServed}
+                onChange={(e) => setAdClientsServed(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ad-observation">Observação (opcional)</Label>
