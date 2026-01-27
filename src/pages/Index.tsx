@@ -10,11 +10,12 @@ import { TransactionForm } from '@/components/TransactionForm';
 import { TransactionList } from '@/components/TransactionList';
 import { MonthlyBarChart, MonthlyPieChart, AnnualRevenueChart, AnnualProfitChart, AnnualComparisonChart } from '@/components/Charts';
 import { ProductivityTab } from '@/components/productivity/ProductivityTab';
+import { PerformanceTab } from '@/components/analysis/PerformanceTab';
 import { MonthlyGoalBar } from '@/components/goals/MonthlyGoalBar';
 import { AnnualGoalBar } from '@/components/goals/AnnualGoalBar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2, Clock } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2, Clock, ChartLine } from 'lucide-react';
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -96,6 +97,10 @@ const Index = () => {
             <TabsTrigger value="productivity" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Clock className="w-4 h-4" />
               Ponto & Produtividade
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <ChartLine className="w-4 h-4" />
+              Análise de Desempenho
             </TabsTrigger>
             <TabsTrigger value="monthly" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Calendar className="w-4 h-4" />
@@ -247,6 +252,15 @@ const Index = () => {
           {/* Ponto & Produtividade */}
           <TabsContent value="productivity" className="animate-fade-in">
             <ProductivityTab />
+          </TabsContent>
+
+          {/* Análise de Desempenho */}
+          <TabsContent value="analysis" className="animate-fade-in">
+            <PerformanceTab 
+              selectedYear={selectedYear} 
+              availableYears={availableYears} 
+              onSelectYear={setSelectedYear} 
+            />
           </TabsContent>
         </Tabs>
       </main>

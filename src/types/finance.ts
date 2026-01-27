@@ -11,6 +11,7 @@ export interface AdExpense {
   date: string;
   platform: 'Meta Ads' | 'Google Ads' | 'Outros';
   value: number;
+  clientsServed?: number;
   observation?: string;
 }
 
@@ -40,6 +41,14 @@ export interface MonthSummary {
   structurePercentage: number;
   grossProfitPercentage: number;
   netProfitPercentage: number;
+}
+
+export interface DailyPerformanceNote {
+  id: string;
+  date: string;
+  positivePoints?: string;
+  improvementOpportunities?: string;
+  performanceRating?: number;
 }
 
 export type MonthKey = 'jan' | 'fev' | 'mar' | 'abr' | 'mai' | 'jun' | 'jul' | 'ago' | 'set' | 'out' | 'nov' | 'dez';
