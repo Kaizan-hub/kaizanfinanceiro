@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MonthKey, MONTHS } from '@/types/finance';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { useProfitGoals } from '@/hooks/useProfitGoals';
@@ -13,9 +13,11 @@ import { ProductivityTab } from '@/components/productivity/ProductivityTab';
 import { PerformanceTab } from '@/components/analysis/PerformanceTab';
 import { MonthlyGoalBar } from '@/components/goals/MonthlyGoalBar';
 import { AnnualGoalBar } from '@/components/goals/AnnualGoalBar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, Wallet, LayoutDashboard, LogOut, Loader2, Clock, ChartLine } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Calendar, Target, LogOut, Loader2, Clock, ChartLine, LayoutDashboard } from 'lucide-react';
+import { cn } from '@/lib/utils';
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -52,6 +54,23 @@ const Index = () => {
     updateAnnualGoal,
   } = useProfitGoals(selectedYear, getMonthSummary);
 
+  // Check if daily profit goal is achieved for header glow effect
+  const todayProfit = useMemo(() => {
+    if (loading) return 0;
+    const today = new Date().toISOString().split('T')[0];
+    const currentMonthKey = MONTHS[new Date().getMonth()].key;
+    const todayData = yearData[currentMonthKey];
+    
+    const todayRevenue = todayData.entries
+      .filter(e => e.date === today)
+      .reduce((sum, e) => sum + e.value, 0);
+    const todayAds = todayData.adExpenses
+      .filter(e => e.date === today)
+      .reduce((sum, e) => sum + e.value, 0);
+    
+    return todayRevenue - todayAds;
+  }, [yearData, loading]);
+
   const handleSignOut = async () => {
     await signOut();
   };
@@ -66,23 +85,37 @@ const Index = () => {
   const monthSummary = getMonthSummary(selectedMonth);
   const monthData = yearData[selectedMonth];
   const currentMonthName = MONTHS.find(m => m.key === selectedMonth)?.fullName || '';
+  
+  const dailyGoal = 500; // Example daily goal
+  const isOnFire = todayProfit >= dailyGoal;
+
   return <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      {/* Header with Dynamic Glow */}
+      <header className={cn(
+        "border-b-2 border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50 transition-all duration-500",
+        isOnFire && "header-on-fire"
+      )}>
         <div className="container py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Wallet className="w-6 h-6 text-primary" />
+              <ThemeToggle />
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <span className="text-2xl font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  X1
+                </span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">X1 Finance</h1>
-                <p className="text-sm text-muted-foreground">Gestão Financeira</p>
+                <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  X1 Finance
+                </h1>
+                <p className="text-xs text-muted-foreground tracking-wider uppercase">
+                  Momentum Edition
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <TransactionForm month={selectedMonth} onAddEntry={entry => addEntry(selectedMonth, entry)} onAddAdExpense={expense => addAdExpense(selectedMonth, expense)} onAddStructureCost={cost => addStructureCost(selectedMonth, cost)} />
-              <Button variant="outline" size="icon" onClick={handleSignOut} title="Sair">
+              <Button variant="outline" size="icon" onClick={handleSignOut} title="Sair" className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors">
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
@@ -266,9 +299,12 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-6 mt-12">
-        <div className="container text-center text-sm text-muted-foreground">
-          <p>X1 Finance • Gestão Financeira para Vendas X1 via WhatsApp</p>
+      <footer className="border-t-2 border-border py-6 mt-12 bg-card/50">
+        <div className="container text-center">
+          <p className="text-sm text-muted-foreground tracking-wider">
+            <span className="font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>X1 Finance</span>
+            {' '} • Momentum Edition • {new Date().getFullYear()}
+          </p>
         </div>
       </footer>
     </div>;

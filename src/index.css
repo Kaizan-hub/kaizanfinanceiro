@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,87 +6,96 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 25% 10%;
+    /* Retro-Modern Marty Supreme - Light Theme */
+    --background: 40 30% 96%;
+    --foreground: 30 20% 12%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card: 45 40% 98%;
+    --card-foreground: 30 20% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover: 45 40% 98%;
+    --popover-foreground: 30 20% 12%;
 
-    --primary: 173 58% 39%;
+    /* Vibrant Orange - Star Color */
+    --primary: 22 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 25% 10%;
+    --secondary: 40 20% 92%;
+    --secondary-foreground: 30 20% 12%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 30 10% 45%;
 
-    --accent: 173 40% 95%;
-    --accent-foreground: 173 58% 30%;
+    --accent: 22 60% 95%;
+    --accent-foreground: 22 100% 40%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 70% 45%;
+    --success: 142 70% 40%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 30 20% 12%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 173 58% 39%;
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
+    --ring: 22 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --chart-revenue: 173 58% 39%;
+    --chart-revenue: 142 70% 40%;
     --chart-ads: 38 92% 50%;
     --chart-structure: 262 52% 55%;
     --chart-profit: 142 70% 45%;
+    
+    /* Paper texture for retro feel */
+    --paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   }
 
   .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
+    /* Retro-Modern Marty Supreme - Dark Theme */
+    --background: 0 0% 10%;
+    --foreground: 40 20% 95%;
 
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 14%;
+    --card-foreground: 40 20% 95%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 14%;
+    --popover-foreground: 40 20% 95%;
 
-    --primary: 173 58% 45%;
-    --primary-foreground: 222 47% 8%;
+    /* Vibrant Orange - Glows intensely in dark */
+    --primary: 22 100% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 30% 18%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 40 20% 95%;
 
-    --muted: 222 30% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 40 10% 60%;
 
-    --accent: 173 40% 15%;
-    --accent-foreground: 173 58% 65%;
+    --accent: 22 40% 20%;
+    --accent-foreground: 22 100% 65%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 142 70% 50%;
-    --success-foreground: 142 70% 10%;
+    --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 55%;
-    --warning-foreground: 38 92% 10%;
+    --warning-foreground: 0 0% 10%;
 
-    --border: 222 30% 20%;
-    --input: 222 30% 20%;
-    --ring: 173 58% 45%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
+    --ring: 22 100% 55%;
 
-    --chart-revenue: 173 58% 50%;
+    --chart-revenue: 142 70% 50%;
     --chart-ads: 38 92% 55%;
     --chart-structure: 262 52% 60%;
     --chart-profit: 142 70% 55%;
+    
+    --paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
   }
 }
 
@@ -98,33 +107,66 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Space Grotesk', system-ui, sans-serif;
+    background-image: var(--paper-texture);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    @apply font-semibold tracking-tight;
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply font-bold tracking-tight;
   }
 }
 
 @layer components {
+  /* Retro Paper Card with Double Border */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg;
+    @apply bg-card border-2 border-border shadow-lg relative;
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.06),
+      0 8px 24px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.5);
   }
 
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px solid hsl(var(--border));
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* 3D Stat Card with Depth */
   .stat-card {
-    @apply glass-card rounded-xl p-5 transition-all duration-300 hover:shadow-xl hover:border-primary/30;
+    @apply glass-card rounded-lg p-5 transition-all duration-300;
+    transform: translateY(0);
+    box-shadow: 
+      0 4px 6px -1px rgba(0,0,0,0.1),
+      0 10px 20px -5px rgba(0,0,0,0.1),
+      0 20px 40px -10px rgba(0,0,0,0.05);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+      0 8px 12px -2px rgba(0,0,0,0.12),
+      0 16px 32px -8px rgba(0,0,0,0.15),
+      0 24px 48px -12px rgba(0,0,0,0.08);
   }
 
   .metric-value {
     @apply text-2xl md:text-3xl font-bold tracking-tight;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
   .metric-label {
     @apply text-sm text-muted-foreground font-medium;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
   .percentage-badge {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
   .percentage-positive {
@@ -140,16 +182,94 @@
   }
 
   .section-title {
-    @apply text-lg font-semibold text-foreground mb-4;
+    @apply text-xl font-bold text-foreground mb-4;
+    font-family: 'Playfair Display', Georgia, serif;
   }
 
   .nav-tab {
     @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
     @apply text-muted-foreground hover:text-foreground hover:bg-secondary;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
   .nav-tab-active {
     @apply nav-tab bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground;
+  }
+
+  /* Retro Paper Document Style */
+  .paper-document {
+    @apply bg-card relative;
+    background-image: 
+      var(--paper-texture),
+      linear-gradient(to bottom, transparent 95%, hsl(var(--border) / 0.3) 95%);
+    background-size: auto, 100% 24px;
+  }
+
+  /* Typewriter Text Style */
+  .typewriter-text {
+    font-family: 'Courier New', Courier, monospace;
+    @apply text-sm tracking-wide;
+    letter-spacing: 0.05em;
+  }
+
+  /* Header Glow Effect for Success */
+  .header-on-fire {
+    position: relative;
+  }
+
+  .header-on-fire::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(90deg, 
+      hsl(22 100% 50% / 0.5),
+      hsl(38 100% 50% / 0.5),
+      hsl(22 100% 50% / 0.5)
+    );
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  /* Stamp Animation Container */
+  .stamp-container {
+    position: relative;
+    overflow: visible;
+  }
+
+  /* Pulsing Notification Dot */
+  .pulse-dot {
+    @apply absolute w-2 h-2 bg-primary rounded-full;
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+
+  .pulse-dot::before {
+    content: '';
+    @apply absolute inset-0 bg-primary rounded-full;
+    animation: pulse-core 1.5s ease-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  @keyframes pulse-core {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
   }
 }
 
@@ -193,9 +313,55 @@
     }
   }
 
+  /* Stamp Keyframes */
+  @keyframes stamp-appear {
+    0% {
+      transform: scale(3) rotate(-15deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(0.9) rotate(5deg);
+      opacity: 1;
+    }
+    75% {
+      transform: scale(1.05) rotate(-2deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .animate-stamp {
+    animation: stamp-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
   .delay-100 { animation-delay: 100ms; }
   .delay-200 { animation-delay: 200ms; }
   .delay-300 { animation-delay: 300ms; }
   .delay-400 { animation-delay: 400ms; }
   .delay-500 { animation-delay: 500ms; }
+
+  /* 3D Button Effect */
+  .btn-3d {
+    @apply relative transition-all duration-200;
+    transform: translateY(0);
+    box-shadow: 
+      0 4px 0 hsl(var(--primary) / 0.7),
+      0 6px 10px rgba(0,0,0,0.15);
+  }
+
+  .btn-3d:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 6px 0 hsl(var(--primary) / 0.7),
+      0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  .btn-3d:active {
+    transform: translateY(2px);
+    box-shadow: 
+      0 2px 0 hsl(var(--primary) / 0.7),
+      0 3px 6px rgba(0,0,0,0.1);
+  }
 }
