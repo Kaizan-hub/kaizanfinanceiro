@@ -13,6 +13,7 @@ import { usePerformanceAnalysis, DateFilterType } from '@/hooks/usePerformanceAn
 import { YearSelector } from '@/components/YearSelector';
 import { StampAnimation } from './StampAnimation';
 import { RecordChallengeCard } from './RecordChallengeCard';
+import { PerformanceReportPDF } from './PerformanceReportPDF';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -114,7 +115,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h2 className="section-title flex items-center gap-2 mb-0">
               <BarChart3 className="w-5 h-5 text-primary" />
               Análise de Desempenho
@@ -123,6 +124,20 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
               selectedYear={selectedYear} 
               availableYears={availableYears} 
               onSelectYear={onSelectYear} 
+            />
+            {/* PDF Export Button */}
+            <PerformanceReportPDF
+              metrics={metrics}
+              dailyClientData={dailyClientData}
+              periodLabel={periodLabel}
+              startDate={start}
+              endDate={end}
+              qualitativeNote={{
+                positivePoints: positivePoints,
+                improvements: improvements,
+                rating: rating,
+                date: format(selectedNoteDate, 'dd/MM/yyyy'),
+              }}
             />
           </div>
           
