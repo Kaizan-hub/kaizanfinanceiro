@@ -74,7 +74,6 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
 
         <div className="flex items-center gap-6 ml-4">
           <TimeColumn label="ENTRADA" value={record?.entry_time ?? null} />
-          <TimeColumn label="INTERVALO" value={record?.break_start ?? null} />
           <TimeColumn label="SAÍDA" value={record?.exit_time ?? null} />
         </div>
       </div>
