@@ -1,5 +1,6 @@
 import { DaySummary } from '@/hooks/useTimeRecords';
 import { cn } from '@/lib/utils';
+import { Check, AlertTriangle, X } from 'lucide-react';
 
 interface ProductivityCalendarProps {
   days: DaySummary[];
@@ -9,7 +10,7 @@ interface ProductivityCalendarProps {
   month: number;
 }
 
-const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const WEEKDAYS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 
 export const ProductivityCalendar = ({ 
   days, 
@@ -21,113 +22,127 @@ export const ProductivityCalendar = ({
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const today = new Date().toISOString().split('T')[0];
 
-  const getStatusColor = (status: DaySummary['status']) => {
-    switch (status) {
+  const getCardStyle = (day: DaySummary, isSelected: boolean, isFuture: boolean) => {
+    if (isSelected) {
+      return {
+        backgroundColor: '#111',
+        color: '#fff',
+        boxShadow: '0 4px 14px rgba(0,0,0,0.35)',
+      };
+    }
+    if (isFuture) {
+      return {
+        backgroundColor: 'transparent',
+        color: 'rgba(0,0,0,0.25)',
+        opacity: 0.25,
+      };
+    }
+    if (!day.record?.entry_time && day.status === 'absent') {
+      return {
+        backgroundColor: '#ef4444',
+        color: '#fff',
+        boxShadow: '0 4px 14px rgba(239,68,68,0.33)',
+      };
+    }
+    switch (day.status) {
       case 'on-time':
-        return 'bg-success';
-      case 'late':
-        return 'bg-warning';
-      case 'absent':
-        return 'bg-destructive';
       case 'overtime':
-        return 'bg-primary';
+        return {
+          backgroundColor: '#16a34a',
+          color: '#fff',
+          boxShadow: '0 4px 14px rgba(22,163,74,0.33)',
+        };
+      case 'late':
+        return {
+          backgroundColor: '#f97316',
+          color: '#fff',
+          boxShadow: '0 4px 14px rgba(249,115,22,0.33)',
+        };
+      case 'absent':
+        return {
+          backgroundColor: '#ef4444',
+          color: '#fff',
+          boxShadow: '0 4px 14px rgba(239,68,68,0.33)',
+        };
       default:
-        return 'bg-muted';
+        return {
+          backgroundColor: '#fff',
+          color: '#ccc',
+        };
     }
   };
 
-  const getStatusLabel = (status: DaySummary['status']) => {
+  const getIcon = (status: DaySummary['status'], isSelected: boolean) => {
+    if (isSelected) {
+      return <X className="w-3.5 h-3.5" />;
+    }
     switch (status) {
       case 'on-time':
-        return 'No horário';
-      case 'late':
-        return 'Atraso';
-      case 'absent':
-        return 'Falta';
       case 'overtime':
-        return 'Hora extra';
+        return <Check className="w-3.5 h-3.5" />;
+      case 'late':
+        return <AlertTriangle className="w-3.5 h-3.5" strokeWidth={2.5} />;
+      case 'absent':
+        return <X className="w-3.5 h-3.5" />;
       default:
-        return 'Sem registro';
+        return null;
     }
   };
 
   return (
-    <div className="stat-card">
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4 mb-4 text-xs">
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-success"></span>
-          <span>No horário ≤ 08:10</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-warning"></span>
-          <span>Atrasado {'>'} 08:10</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-destructive"></span>
-          <span>Falta</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-primary"></span>
-          <span>Hora extra</span>
-        </div>
-      </div>
-
+    <div>
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-2 mb-2">
         {WEEKDAYS.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
+          <div key={day} className="text-center text-[11px] uppercase tracking-wider font-medium text-muted-foreground py-1">
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
-        {/* Empty cells for days before the first day of month */}
+      <div className="grid grid-cols-7 gap-2">
+        {/* Empty cells */}
         {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-          <div key={`empty-${i}`} className="aspect-square"></div>
+          <div key={`empty-${i}`} />
         ))}
 
         {/* Day cells */}
         {days.map((day) => {
           const dayNumber = parseInt(day.date.split('-')[2]);
           const isSelected = day.date === selectedDate;
+          const isFuture = new Date(day.date + 'T23:59:59') > new Date();
           const isToday = day.date === today;
-          const isFuture = new Date(day.date) > new Date();
+          const hasRecord = !!day.record?.entry_time;
+          const style = getCardStyle(day, isSelected, isFuture);
+          const showIcon = !isFuture && (hasRecord || day.status === 'absent');
+          const icon = getIcon(day.status, isSelected);
 
           return (
             <button
               key={day.date}
               onClick={() => onSelectDate(day.date)}
               className={cn(
-                'aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 text-sm transition-all',
-                'hover:ring-2 hover:ring-primary/50',
-                isSelected && 'ring-2 ring-primary',
-                isToday && 'font-bold',
-                isFuture && 'opacity-50'
+                'flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:scale-[1.05]',
+                'rounded-[14px] py-3 px-2 min-h-[80px]',
+                isToday && !isSelected && 'ring-2 ring-foreground/20'
               )}
+              style={style}
             >
-              <span className="text-foreground">{dayNumber}</span>
-              {!isFuture && (
-                <div className="flex gap-0.5">
-                  {day.record?.entry_time && (
-                    <span className={cn('w-1.5 h-1.5 rounded-full', getStatusColor(day.status))}></span>
-                  )}
-                  {day.record?.break_start && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50"></span>
-                  )}
-                  {day.record?.break_end && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50"></span>
-                  )}
-                  {day.record?.exit_time && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-foreground/50"></span>
-                  )}
-                </div>
+              <span className="text-[15px] font-bold">{dayNumber}</span>
+              {showIcon && (
+                <span 
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  style={{ 
+                    backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.25)' 
+                  }}
+                >
+                  {icon}
+                </span>
               )}
-              {!isFuture && !day.record?.entry_time && day.status === 'absent' && (
-                <span className="w-3 h-3 rounded-full bg-destructive flex items-center justify-center">
-                  <span className="text-[8px] text-destructive-foreground font-bold">!</span>
+              {hasRecord && day.record?.entry_time && (
+                <span className="text-[9px]" style={{ opacity: 0.7 }}>
+                  {day.record.entry_time}
                 </span>
               )}
             </button>

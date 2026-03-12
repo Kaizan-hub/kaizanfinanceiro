@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DaySummary } from '@/hooks/useTimeRecords';
-import { Clock, Coffee, LogIn, LogOut, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -19,26 +18,24 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
   const [timeValue, setTimeValue] = useState('');
 
   const record = daySummary?.record;
-  const formattedDate = format(parseISO(selectedDate), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const dateObj = parseISO(selectedDate);
+  const dayLabel = format(dateObj, "EEE, d MMM", { locale: ptBR });
 
-  const getStatusInfo = () => {
-    if (!daySummary) return { label: 'Sem registro', color: 'bg-muted text-muted-foreground' };
-    
+  const getStatusBadge = () => {
+    if (!daySummary) return null;
     switch (daySummary.status) {
       case 'on-time':
-        return { label: 'No horário', color: 'bg-success/10 text-success' };
+        return <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#16a34a' }}>NO HORÁRIO</span>;
       case 'late':
-        return { label: 'Atraso', color: 'bg-warning/10 text-warning' };
+        return <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#f97316' }}>ATRASO</span>;
       case 'absent':
-        return { label: 'Falta', color: 'bg-destructive/10 text-destructive' };
+        return <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#ef4444' }}>FALTA</span>;
       case 'overtime':
-        return { label: 'Hora extra', color: 'bg-primary/10 text-primary' };
+        return <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#16a34a' }}>HORA EXTRA</span>;
       default:
-        return { label: 'Incompleto', color: 'bg-muted text-muted-foreground' };
+        return null;
     }
   };
-
-  const statusInfo = getStatusInfo();
 
   const handleSaveTime = async (field: 'entry_time' | 'break_start' | 'break_end' | 'exit_time') => {
     if (timeValue) {
@@ -48,138 +45,84 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
     }
   };
 
-  const handleRegisterNow = async (field: 'entry_time' | 'break_start' | 'break_end' | 'exit_time') => {
-    await onRegisterNow(field);
+  const getNextAction = (): { field: 'entry_time' | 'break_start' | 'break_end' | 'exit_time'; label: string } | null => {
+    if (!record?.entry_time) return { field: 'entry_time', label: '+ Registrar entrada' };
+    if (!record?.break_start) return { field: 'break_start', label: '+ Registrar intervalo' };
+    if (!record?.break_end) return { field: 'break_end', label: '+ Registrar retorno' };
+    if (!record?.exit_time) return { field: 'exit_time', label: '+ Registrar saída' };
+    return null;
   };
 
-  const TimeField = ({ 
-    label, 
-    value, 
-    field, 
-    icon: Icon 
-  }: { 
-    label: string; 
-    value: string | null; 
-    field: 'entry_time' | 'break_start' | 'break_end' | 'exit_time';
-    icon: typeof Clock;
-  }) => (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Icon className="w-4 h-4" />
-        <span>{label}</span>
+  const nextAction = getNextAction();
+
+  const TimeColumn = ({ label, value }: { label: string; value: string | null }) => (
+    <div>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
+      <p className="text-base font-bold text-foreground">{value || '--:--'}</p>
+    </div>
+  );
+
+  return (
+    <div 
+      className="flex items-center justify-between rounded-[20px] border border-border bg-card px-7 py-6"
+    >
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
+          <p className="text-base font-semibold capitalize text-foreground">{dayLabel}</p>
+          {getStatusBadge()}
+        </div>
+
+        <div className="flex items-center gap-6 ml-4">
+          <TimeColumn label="ENTRADA" value={record?.entry_time ?? null} />
+          <TimeColumn label="INTERVALO" value={record?.break_start ?? null} />
+          <TimeColumn label="SAÍDA" value={record?.exit_time ?? null} />
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        {editingField === field ? (
-          <>
+
+      <div>
+        {editingField ? (
+          <div className="flex items-center gap-2">
             <Input
               type="time"
               value={timeValue}
               onChange={(e) => setTimeValue(e.target.value)}
-              className="w-24"
+              className="w-28"
+              autoFocus
             />
-            <Button size="sm" onClick={() => handleSaveTime(field)}>
+            <button
+              onClick={() => handleSaveTime(editingField as any)}
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-white"
+              style={{ backgroundColor: '#111' }}
+            >
               Salvar
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setEditingField(null)}>
-              Cancelar
-            </Button>
-          </>
+            </button>
+            <button
+              onClick={() => { setEditingField(null); setTimeValue(''); }}
+              className="px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground"
+            >
+              ×
+            </button>
+          </div>
+        ) : nextAction ? (
+          <button
+            onClick={() => {
+              const isToday = selectedDate === new Date().toISOString().split('T')[0];
+              if (isToday) {
+                onRegisterNow(nextAction.field);
+              } else {
+                setEditingField(nextAction.field);
+                setTimeValue('');
+              }
+            }}
+            className="px-6 py-3 rounded-[12px] text-sm font-semibold text-white transition-all hover:scale-[1.03]"
+            style={{ backgroundColor: '#111' }}
+          >
+            {nextAction.label}
+          </button>
         ) : (
-          <>
-            <span className="text-xl font-bold">{value || '--:--'}</span>
-            {!value && (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="text-xs gap-1"
-                onClick={() => {
-                  setEditingField(field);
-                  setTimeValue('');
-                }}
-              >
-                <Plus className="w-3 h-3" />
-                Registrar
-              </Button>
-            )}
-          </>
+          <span className="text-sm text-muted-foreground">Dia completo ✓</span>
         )}
       </div>
-    </div>
-  );
-
-  const isToday = selectedDate === new Date().toISOString().split('T')[0];
-
-  return (
-    <div className="stat-card space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-semibold">Dia Selecionado</h3>
-          <p className="text-sm text-muted-foreground capitalize">{formattedDate}</p>
-        </div>
-        <span className={cn('px-3 py-1 rounded-full text-xs font-medium', statusInfo.color)}>
-          {statusInfo.label}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <TimeField label="Entrada" value={record?.entry_time ?? null} field="entry_time" icon={LogIn} />
-        <TimeField label="Intervalo" value={record?.break_start ?? null} field="break_start" icon={Coffee} />
-        <TimeField label="Retorno" value={record?.break_end ?? null} field="break_end" icon={Coffee} />
-        <TimeField label="Saída" value={record?.exit_time ?? null} field="exit_time" icon={LogOut} />
-      </div>
-
-      {isToday && (
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-          <Button 
-            size="sm" 
-            variant="outline"
-            className="text-xs gap-1"
-            onClick={() => handleRegisterNow('entry_time')}
-            disabled={!!record?.entry_time}
-          >
-            <Plus className="w-3 h-3" />
-            Registrar Entrada
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline"
-            className="text-xs gap-1"
-            onClick={() => handleRegisterNow('break_start')}
-            disabled={!record?.entry_time || !!record?.break_start}
-          >
-            <Plus className="w-3 h-3" />
-            Registrar Início do Intervalo
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline"
-            className="text-xs gap-1"
-            onClick={() => handleRegisterNow('break_end')}
-            disabled={!record?.break_start || !!record?.break_end}
-          >
-            <Plus className="w-3 h-3" />
-            Registrar Fim do Intervalo
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline"
-            className="text-xs gap-1"
-            onClick={() => handleRegisterNow('exit_time')}
-            disabled={!record?.break_end || !!record?.exit_time}
-          >
-            <Plus className="w-3 h-3" />
-            Registrar Saída
-          </Button>
-        </div>
-      )}
-
-      {daySummary && daySummary.hoursWorked > 0 && (
-        <div className="pt-2 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            Horas trabalhadas: <span className="font-bold text-foreground">{daySummary.hoursWorked.toFixed(1)}h</span>
-          </p>
-        </div>
-      )}
     </div>
   );
 };
