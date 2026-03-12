@@ -47,8 +47,6 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
 
   const getNextAction = (): { field: 'entry_time' | 'break_start' | 'break_end' | 'exit_time'; label: string } | null => {
     if (!record?.entry_time) return { field: 'entry_time', label: '+ Registrar entrada' };
-    if (!record?.break_start) return { field: 'break_start', label: '+ Registrar intervalo' };
-    if (!record?.break_end) return { field: 'break_end', label: '+ Registrar retorno' };
     if (!record?.exit_time) return { field: 'exit_time', label: '+ Registrar saída' };
     return null;
   };
