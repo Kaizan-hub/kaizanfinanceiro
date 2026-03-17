@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { DaySummary } from '@/hooks/useTimeRecords';
-import { Plus } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -45,6 +45,11 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
     }
   };
 
+  const startEditing = (field: string, currentValue: string | null) => {
+    setEditingField(field);
+    setTimeValue(currentValue || '');
+  };
+
   const getNextAction = (): { field: 'entry_time' | 'break_start' | 'break_end' | 'exit_time'; label: string } | null => {
     if (!record?.entry_time) return { field: 'entry_time', label: '+ Registrar entrada' };
     if (!record?.exit_time) return { field: 'exit_time', label: '+ Registrar saída' };
@@ -53,17 +58,60 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
 
   const nextAction = getNextAction();
 
-  const TimeColumn = ({ label, value }: { label: string; value: string | null }) => (
-    <div>
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
-      <p className="text-base font-bold text-foreground">{value || '--:--'}</p>
-    </div>
-  );
+  const TimeColumn = ({ label, value, field }: { label: string; value: string | null; field: 'entry_time' | 'exit_time' }) => {
+    const isEditing = editingField === field;
+
+    if (isEditing) {
+      return (
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
+          <div className="flex items-center gap-1.5">
+            <Input
+              type="time"
+              value={timeValue}
+              onChange={(e) => setTimeValue(e.target.value)}
+              className="w-24 h-8 text-sm"
+              autoFocus
+            />
+            <button
+              onClick={() => handleSaveTime(field)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
+              style={{ backgroundColor: '#16a34a' }}
+            >
+              ✓
+            </button>
+            <button
+              onClick={() => { setEditingField(null); setTimeValue(''); }}
+              className="px-2 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="group/time">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-base font-bold text-foreground">{value || '--:--'}</p>
+          {value && (
+            <button
+              onClick={() => startEditing(field, value)}
+              className="opacity-0 group-hover/time:opacity-100 transition-opacity p-1 rounded-md hover:bg-muted"
+              title={`Editar ${label.toLowerCase()}`}
+            >
+              <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div 
-      className="flex items-center justify-between rounded-[20px] border border-border bg-card px-7 py-6"
-    >
+    <div className="flex items-center justify-between rounded-[20px] border border-border bg-card px-7 py-6">
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
           <p className="text-base font-semibold capitalize text-foreground">{dayLabel}</p>
@@ -71,44 +119,20 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
         </div>
 
         <div className="flex items-center gap-6 ml-4">
-          <TimeColumn label="ENTRADA" value={record?.entry_time ?? null} />
-          <TimeColumn label="SAÍDA" value={record?.exit_time ?? null} />
+          <TimeColumn label="ENTRADA" value={record?.entry_time ?? null} field="entry_time" />
+          <TimeColumn label="SAÍDA" value={record?.exit_time ?? null} field="exit_time" />
         </div>
       </div>
 
       <div>
-        {editingField ? (
-          <div className="flex items-center gap-2">
-            <Input
-              type="time"
-              value={timeValue}
-              onChange={(e) => setTimeValue(e.target.value)}
-              className="w-28"
-              autoFocus
-            />
-            <button
-              onClick={() => handleSaveTime(editingField as any)}
-              className="px-4 py-2 rounded-xl text-sm font-semibold text-white"
-              style={{ backgroundColor: '#111' }}
-            >
-              Salvar
-            </button>
-            <button
-              onClick={() => { setEditingField(null); setTimeValue(''); }}
-              className="px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground"
-            >
-              ×
-            </button>
-          </div>
-        ) : nextAction ? (
+        {!editingField && nextAction ? (
           <button
             onClick={() => {
               const isToday = selectedDate === new Date().toISOString().split('T')[0];
               if (isToday) {
                 onRegisterNow(nextAction.field);
               } else {
-                setEditingField(nextAction.field);
-                setTimeValue('');
+                startEditing(nextAction.field, null);
               }
             }}
             className="px-6 py-3 rounded-[12px] text-sm font-semibold text-white transition-all hover:scale-[1.03]"
@@ -116,9 +140,9 @@ export const DayDetail = ({ daySummary, selectedDate, onRegisterTime, onRegister
           >
             {nextAction.label}
           </button>
-        ) : (
+        ) : !editingField && !nextAction ? (
           <span className="text-sm text-muted-foreground">Dia completo ✓</span>
-        )}
+        ) : null}
       </div>
     </div>
   );
