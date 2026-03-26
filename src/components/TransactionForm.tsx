@@ -50,7 +50,7 @@ export const TransactionForm = ({
   const [adValue, setAdValue] = useState('');
   const [adClientsServed, setAdClientsServed] = useState('');
   const [adObservation, setAdObservation] = useState('');
-
+  const [adIncludeTax, setAdIncludeTax] = useState(false);
   // Structure cost state
   const [structureType, setStructureType] = useState<'ferramentas' | 'assinaturas' | 'plataformas' | 'outros'>('ferramentas');
   const [structureDate, setStructureDate] = useState('');
@@ -68,6 +68,7 @@ export const TransactionForm = ({
     setAdValue('');
     setAdClientsServed('');
     setAdObservation('');
+    setAdIncludeTax(false);
     setStructureType('ferramentas');
     setStructureDate('');
     setStructureValue('');
@@ -89,12 +90,16 @@ export const TransactionForm = ({
 
   const handleAddAdExpense = () => {
     if (!adDate || !adValue || !adClientsServed) return;
+    const baseValue = parseFloat(adValue);
+    const taxValue = adIncludeTax ? baseValue * 0.125 : 0;
+    const totalValue = baseValue + taxValue;
+    const taxNote = adIncludeTax ? ` [+12,5% imposto Meta: R$ ${taxValue.toFixed(2)}]` : '';
     onAddAdExpense({
       date: adDate,
       platform: adPlatform,
-      value: parseFloat(adValue),
+      value: totalValue,
       clientsServed: parseInt(adClientsServed, 10),
-      observation: adObservation || undefined,
+      observation: (adObservation || '') + taxNote || undefined,
     });
     resetForms();
     setOpen(false);
@@ -230,6 +235,21 @@ export const TransactionForm = ({
                 min="0"
                 value={adClientsServed}
                 onChange={(e) => setAdClientsServed(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-border/50 bg-secondary/30 px-4 py-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="ad-tax" className="text-sm font-medium">+ Imposto Meta (12,5%)</Label>
+                {adIncludeTax && adValue && (
+                  <p className="text-xs text-destructive font-semibold">
+                    Imposto: R$ {(parseFloat(adValue) * 0.125).toFixed(2)} → Total: R$ {(parseFloat(adValue) * 1.125).toFixed(2)}
+                  </p>
+                )}
+              </div>
+              <Switch
+                id="ad-tax"
+                checked={adIncludeTax}
+                onCheckedChange={setAdIncludeTax}
               />
             </div>
             <div className="space-y-2">

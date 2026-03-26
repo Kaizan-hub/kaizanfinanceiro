@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
@@ -19,9 +19,7 @@ import {
   Loader2,
   HelpCircle,
   UserCheck,
-  ReceiptText,
 } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -63,13 +61,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
     : dateFilter === 'last7days' ? 'Últimos 7 Dias'
     : `${format(start, 'dd/MM')} - ${format(end, 'dd/MM')}`;
 
-  const [showMetaTax, setShowMetaTax] = useState(false);
-
-  const metaTax = metrics.totalAds * 0.125;
-  const grossAds = metrics.totalAds + metaTax;
-  const displayAds = showMetaTax ? grossAds : metrics.totalAds;
-  const displayNetProfit = showMetaTax ? metrics.totalRevenue - grossAds : metrics.netProfit;
-  const costPerLead = metrics.totalClientsServed > 0 ? displayAds / metrics.totalClientsServed : 0;
+  const costPerLead = metrics.totalClientsServed > 0 ? metrics.totalAds / metrics.totalClientsServed : 0;
 
   const maxClients = useMemo(() => {
     if (dailyClientData.length === 0) return 0;
@@ -89,12 +81,10 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
     );
   }
 
-  const displayRoas = displayAds > 0 ? metrics.totalRevenue / displayAds : 0;
-
   const metricCards = [
     { title: 'RECEITA TOTAL', value: formatCurrency(metrics.totalRevenue), icon: <DollarSign className="w-3.5 h-3.5" />, color: '#22c55e', tooltip: 'Soma de todas as receitas no período' },
-    { title: 'GASTOS COM ADS', value: formatCurrency(displayAds), icon: <TrendingDown className="w-3.5 h-3.5" />, color: '#f97316', tooltip: showMetaTax ? `Líquido: ${formatCurrency(metrics.totalAds)} + Imposto: ${formatCurrency(metaTax)}` : 'Total investido em anúncios e mídia paga', subtitle: showMetaTax ? `Imposto: ${formatCurrency(metaTax)}` : undefined },
-    { title: 'ROAS', value: `${displayRoas.toFixed(2)}x`, icon: <Target className="w-3.5 h-3.5" />, color: '#a78bfa', tooltip: 'Receita ÷ Gastos com Ads' },
+    { title: 'GASTOS COM ADS', value: formatCurrency(metrics.totalAds), icon: <TrendingDown className="w-3.5 h-3.5" />, color: '#f97316', tooltip: 'Total investido em anúncios (já com imposto se aplicado)' },
+    { title: 'ROAS', value: `${metrics.roas.toFixed(2)}x`, icon: <Target className="w-3.5 h-3.5" />, color: '#a78bfa', tooltip: 'Receita ÷ Gastos com Ads' },
     { title: 'CUSTO POR LEAD', value: formatCurrency(costPerLead), icon: <UserCheck className="w-3.5 h-3.5" />, color: '#f97316', tooltip: 'Gastos com Ads ÷ Clientes Atendidos' },
   ];
 
@@ -176,27 +166,11 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
               </div>
               <p style={{
                 fontSize: 52, fontWeight: 900, letterSpacing: -2, lineHeight: 1,
-                color: displayNetProfit >= 0 ? '#22c55e' : '#ef4444',
+                color: metrics.netProfit >= 0 ? '#22c55e' : '#ef4444',
               }}>
-                {formatCurrency(displayNetProfit)}
+                {formatCurrency(metrics.netProfit)}
               </p>
-              <div className="flex items-center gap-3 mt-3">
-                <p style={{ fontSize: 12, color: '#444' }}>{periodLabel}</p>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-lg" style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)' }}>
-                  <ReceiptText className="w-3.5 h-3.5" style={{ color: '#f97316' }} />
-                  <span style={{ fontSize: 11, color: '#f97316', fontWeight: 500 }}>Imposto Meta 12,5%</span>
-                  <Switch
-                    checked={showMetaTax}
-                    onCheckedChange={setShowMetaTax}
-                    className="scale-75"
-                  />
-                </div>
-                {showMetaTax && (
-                  <span style={{ fontSize: 12, color: '#ef4444', fontWeight: 600 }}>
-                    -{formatCurrency(metaTax)}
-                  </span>
-                )}
-              </div>
+              <p style={{ fontSize: 12, color: '#444', marginTop: 8 }}>{periodLabel}</p>
             </div>
             <div className="text-right hidden sm:block">
               <p style={{ fontSize: 11, textTransform: 'uppercase', color: '#444', letterSpacing: 2, marginBottom: 4 }}>Período</p>
@@ -308,7 +282,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
               <div style={{ background: '#1a1a1a', borderRadius: 10, padding: '8px 16px' }}>
                 <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#444', marginBottom: 4 }}>Custo por Lead</p>
                 <p style={{ fontSize: 20, fontWeight: 800, color: '#ef4444' }}>{formatCurrency(costPerLead)}</p>
-                <p style={{ fontSize: 11, color: '#333', marginTop: 2 }}>↗ Ads: {formatCurrency(displayAds)}</p>
+                <p style={{ fontSize: 11, color: '#333', marginTop: 2 }}>↗ Ads: {formatCurrency(metrics.totalAds)}</p>
               </div>
             </div>
           </div>
