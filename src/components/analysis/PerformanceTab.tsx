@@ -63,13 +63,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
     : dateFilter === 'last7days' ? 'Últimos 7 Dias'
     : `${format(start, 'dd/MM')} - ${format(end, 'dd/MM')}`;
 
-  const [showMetaTax, setShowMetaTax] = useState(false);
-
-  const metaTax = metrics.totalAds * 0.125;
-  const grossAds = metrics.totalAds + metaTax;
-  const displayAds = showMetaTax ? grossAds : metrics.totalAds;
-  const displayNetProfit = showMetaTax ? metrics.totalRevenue - grossAds : metrics.netProfit;
-  const costPerLead = metrics.totalClientsServed > 0 ? displayAds / metrics.totalClientsServed : 0;
+  const costPerLead = metrics.totalClientsServed > 0 ? metrics.totalAds / metrics.totalClientsServed : 0;
 
   const maxClients = useMemo(() => {
     if (dailyClientData.length === 0) return 0;
