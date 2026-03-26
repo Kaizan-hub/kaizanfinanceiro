@@ -176,11 +176,27 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
               </div>
               <p style={{
                 fontSize: 52, fontWeight: 900, letterSpacing: -2, lineHeight: 1,
-                color: metrics.netProfit >= 0 ? '#22c55e' : '#ef4444',
+                color: displayNetProfit >= 0 ? '#22c55e' : '#ef4444',
               }}>
-                {formatCurrency(metrics.netProfit)}
+                {formatCurrency(displayNetProfit)}
               </p>
-              <p style={{ fontSize: 12, color: '#444', marginTop: 8 }}>{periodLabel}</p>
+              <div className="flex items-center gap-3 mt-3">
+                <p style={{ fontSize: 12, color: '#444' }}>{periodLabel}</p>
+                <div className="flex items-center gap-2 px-3 py-1 rounded-lg" style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)' }}>
+                  <ReceiptText className="w-3.5 h-3.5" style={{ color: '#f97316' }} />
+                  <span style={{ fontSize: 11, color: '#f97316', fontWeight: 500 }}>Imposto Meta 12,5%</span>
+                  <Switch
+                    checked={showMetaTax}
+                    onCheckedChange={setShowMetaTax}
+                    className="scale-75"
+                  />
+                </div>
+                {showMetaTax && (
+                  <span style={{ fontSize: 12, color: '#ef4444', fontWeight: 600 }}>
+                    -{formatCurrency(metaTax)}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="text-right hidden sm:block">
               <p style={{ fontSize: 11, textTransform: 'uppercase', color: '#444', letterSpacing: 2, marginBottom: 4 }}>Período</p>
