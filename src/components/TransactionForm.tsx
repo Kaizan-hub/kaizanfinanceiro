@@ -90,12 +90,16 @@ export const TransactionForm = ({
 
   const handleAddAdExpense = () => {
     if (!adDate || !adValue || !adClientsServed) return;
+    const baseValue = parseFloat(adValue);
+    const taxValue = adIncludeTax ? baseValue * 0.125 : 0;
+    const totalValue = baseValue + taxValue;
+    const taxNote = adIncludeTax ? ` [+12,5% imposto Meta: R$ ${taxValue.toFixed(2)}]` : '';
     onAddAdExpense({
       date: adDate,
       platform: adPlatform,
-      value: parseFloat(adValue),
+      value: totalValue,
       clientsServed: parseInt(adClientsServed, 10),
-      observation: adObservation || undefined,
+      observation: (adObservation || '') + taxNote || undefined,
     });
     resetForms();
     setOpen(false);
