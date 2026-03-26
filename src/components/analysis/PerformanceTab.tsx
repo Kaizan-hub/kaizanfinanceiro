@@ -308,7 +308,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
               <div style={{ background: '#1a1a1a', borderRadius: 10, padding: '8px 16px' }}>
                 <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#444', marginBottom: 4 }}>Custo por Lead</p>
                 <p style={{ fontSize: 20, fontWeight: 800, color: '#ef4444' }}>{formatCurrency(costPerLead)}</p>
-                <p style={{ fontSize: 11, color: '#333', marginTop: 2 }}>↗ Ads: {formatCurrency(metrics.totalAds)}</p>
+                <p style={{ fontSize: 11, color: '#333', marginTop: 2 }}>↗ Ads: {formatCurrency(displayAds)}</p>
               </div>
             </div>
           </div>
