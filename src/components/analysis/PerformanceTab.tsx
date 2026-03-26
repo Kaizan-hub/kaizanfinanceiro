@@ -242,6 +242,9 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
               <p style={{ fontSize: 22, fontWeight: 800, color: card.color, letterSpacing: '-0.5px', lineHeight: 1.1 }}>
                 {card.value}
               </p>
+              {(card as any).subtitle && (
+                <p style={{ fontSize: 10, color: '#ef4444', marginTop: 4, fontWeight: 600 }}>{(card as any).subtitle}</p>
+              )}
               <p style={{ fontSize: 10, color: '#333', marginTop: 4 }}>{periodLabel}</p>
             </div>
           </motion.div>
