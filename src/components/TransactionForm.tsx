@@ -237,6 +237,21 @@ export const TransactionForm = ({
                 onChange={(e) => setAdClientsServed(e.target.value)}
               />
             </div>
+            <div className="flex items-center justify-between rounded-lg border border-border/50 bg-secondary/30 px-4 py-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="ad-tax" className="text-sm font-medium">+ Imposto Meta (12,5%)</Label>
+                {adIncludeTax && adValue && (
+                  <p className="text-xs text-destructive font-semibold">
+                    Imposto: R$ {(parseFloat(adValue) * 0.125).toFixed(2)} → Total: R$ {(parseFloat(adValue) * 1.125).toFixed(2)}
+                  </p>
+                )}
+              </div>
+              <Switch
+                id="ad-tax"
+                checked={adIncludeTax}
+                onCheckedChange={setAdIncludeTax}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="ad-observation">Observação (opcional)</Label>
               <Textarea
