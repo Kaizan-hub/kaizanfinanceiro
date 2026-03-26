@@ -50,7 +50,7 @@ export const TransactionForm = ({
   const [adValue, setAdValue] = useState('');
   const [adClientsServed, setAdClientsServed] = useState('');
   const [adObservation, setAdObservation] = useState('');
-
+  const [adIncludeTax, setAdIncludeTax] = useState(false);
   // Structure cost state
   const [structureType, setStructureType] = useState<'ferramentas' | 'assinaturas' | 'plataformas' | 'outros'>('ferramentas');
   const [structureDate, setStructureDate] = useState('');
