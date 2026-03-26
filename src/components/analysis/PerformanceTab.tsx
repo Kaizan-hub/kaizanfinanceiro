@@ -22,7 +22,6 @@ import {
   ReceiptText,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 
