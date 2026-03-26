@@ -89,10 +89,12 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
     );
   }
 
+  const displayRoas = displayAds > 0 ? metrics.totalRevenue / displayAds : 0;
+
   const metricCards = [
     { title: 'RECEITA TOTAL', value: formatCurrency(metrics.totalRevenue), icon: <DollarSign className="w-3.5 h-3.5" />, color: '#22c55e', tooltip: 'Soma de todas as receitas no período' },
-    { title: 'GASTOS COM ADS', value: formatCurrency(metrics.totalAds), icon: <TrendingDown className="w-3.5 h-3.5" />, color: '#f97316', tooltip: 'Total investido em anúncios e mídia paga' },
-    { title: 'ROAS', value: `${metrics.roas.toFixed(2)}x`, icon: <Target className="w-3.5 h-3.5" />, color: '#a78bfa', tooltip: 'Receita ÷ Gastos com Ads' },
+    { title: 'GASTOS COM ADS', value: formatCurrency(displayAds), icon: <TrendingDown className="w-3.5 h-3.5" />, color: '#f97316', tooltip: showMetaTax ? `Líquido: ${formatCurrency(metrics.totalAds)} + Imposto: ${formatCurrency(metaTax)}` : 'Total investido em anúncios e mídia paga', subtitle: showMetaTax ? `Imposto: ${formatCurrency(metaTax)}` : undefined },
+    { title: 'ROAS', value: `${displayRoas.toFixed(2)}x`, icon: <Target className="w-3.5 h-3.5" />, color: '#a78bfa', tooltip: 'Receita ÷ Gastos com Ads' },
     { title: 'CUSTO POR LEAD', value: formatCurrency(costPerLead), icon: <UserCheck className="w-3.5 h-3.5" />, color: '#f97316', tooltip: 'Gastos com Ads ÷ Clientes Atendidos' },
   ];
 
