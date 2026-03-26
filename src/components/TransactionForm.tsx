@@ -68,6 +68,7 @@ export const TransactionForm = ({
     setAdValue('');
     setAdClientsServed('');
     setAdObservation('');
+    setAdIncludeTax(false);
     setStructureType('ferramentas');
     setStructureDate('');
     setStructureValue('');
