@@ -140,7 +140,7 @@ export const useFinanceData = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, selectedYear, currentYear, toast]);
+  }, [user, selectedYear, currentYear]);
 
   useEffect(() => {
     fetchData();
@@ -192,7 +192,7 @@ export const useFinanceData = () => {
         variant: 'destructive',
       });
     }
-  }, [user, selectedYear, toast]);
+  }, [user, selectedYear]);
 
   const removeEntry = useCallback(async (month: MonthKey, id: string) => {
     if (!user) return;
@@ -226,7 +226,7 @@ export const useFinanceData = () => {
         variant: 'destructive',
       });
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Ad expense operations
   const addAdExpense = useCallback(async (month: MonthKey, expense: Omit<AdExpense, 'id'>) => {
@@ -276,7 +276,7 @@ export const useFinanceData = () => {
         variant: 'destructive',
       });
     }
-  }, [user, selectedYear, toast]);
+  }, [user, selectedYear]);
 
   const removeAdExpense = useCallback(async (month: MonthKey, id: string) => {
     if (!user) return;
@@ -310,7 +310,7 @@ export const useFinanceData = () => {
         variant: 'destructive',
       });
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Structure cost operations
   const addStructureCost = useCallback(async (month: MonthKey, cost: Omit<StructureCost, 'id'>) => {
@@ -360,7 +360,7 @@ export const useFinanceData = () => {
         variant: 'destructive',
       });
     }
-  }, [user, selectedYear, toast]);
+  }, [user, selectedYear]);
 
   const removeStructureCost = useCallback(async (month: MonthKey, id: string) => {
     if (!user) return;
@@ -394,7 +394,7 @@ export const useFinanceData = () => {
         variant: 'destructive',
       });
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Calculate monthly summary
   const getMonthSummary = useCallback((month: MonthKey): MonthSummary => {
