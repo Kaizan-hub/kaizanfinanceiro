@@ -132,7 +132,7 @@ export const useFinanceData = () => {
 
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível carregar os dados.',
         variant: 'destructive',
@@ -180,13 +180,13 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Entrada adicionada com sucesso!',
       });
     } catch (error) {
       console.error('Error adding entry:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível adicionar a entrada.',
         variant: 'destructive',
@@ -214,13 +214,13 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Entrada removida com sucesso!',
       });
     } catch (error) {
       console.error('Error removing entry:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível remover a entrada.',
         variant: 'destructive',
@@ -264,13 +264,13 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Gasto com Ads adicionado com sucesso!',
       });
     } catch (error) {
       console.error('Error adding ad expense:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível adicionar o gasto com Ads.',
         variant: 'destructive',
@@ -298,13 +298,13 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Gasto com Ads removido com sucesso!',
       });
     } catch (error) {
       console.error('Error removing ad expense:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível remover o gasto com Ads.',
         variant: 'destructive',
@@ -348,13 +348,13 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Custo de estrutura adicionado com sucesso!',
       });
     } catch (error) {
       console.error('Error adding structure cost:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível adicionar o custo de estrutura.',
         variant: 'destructive',
@@ -382,13 +382,13 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Custo de estrutura removido com sucesso!',
       });
     } catch (error) {
       console.error('Error removing structure cost:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível remover o custo de estrutura.',
         variant: 'destructive',
