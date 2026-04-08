@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -42,6 +42,8 @@ export const useFinanceData = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   // Fetch data from database
   const fetchData = useCallback(async () => {
@@ -130,7 +132,7 @@ export const useFinanceData = () => {
 
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível carregar os dados.',
         variant: 'destructive',
@@ -138,7 +140,7 @@ export const useFinanceData = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, selectedYear, currentYear, toast]);
+  }, [user, selectedYear, currentYear]);
 
   useEffect(() => {
     fetchData();
@@ -178,19 +180,19 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Entrada adicionada com sucesso!',
       });
     } catch (error) {
       console.error('Error adding entry:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível adicionar a entrada.',
         variant: 'destructive',
       });
     }
-  }, [user, selectedYear, toast]);
+  }, [user, selectedYear]);
 
   const removeEntry = useCallback(async (month: MonthKey, id: string) => {
     if (!user) return;
@@ -212,19 +214,19 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Entrada removida com sucesso!',
       });
     } catch (error) {
       console.error('Error removing entry:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível remover a entrada.',
         variant: 'destructive',
       });
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Ad expense operations
   const addAdExpense = useCallback(async (month: MonthKey, expense: Omit<AdExpense, 'id'>) => {
@@ -262,19 +264,19 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Gasto com Ads adicionado com sucesso!',
       });
     } catch (error) {
       console.error('Error adding ad expense:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível adicionar o gasto com Ads.',
         variant: 'destructive',
       });
     }
-  }, [user, selectedYear, toast]);
+  }, [user, selectedYear]);
 
   const removeAdExpense = useCallback(async (month: MonthKey, id: string) => {
     if (!user) return;
@@ -296,19 +298,19 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Gasto com Ads removido com sucesso!',
       });
     } catch (error) {
       console.error('Error removing ad expense:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível remover o gasto com Ads.',
         variant: 'destructive',
       });
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Structure cost operations
   const addStructureCost = useCallback(async (month: MonthKey, cost: Omit<StructureCost, 'id'>) => {
@@ -346,19 +348,19 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Custo de estrutura adicionado com sucesso!',
       });
     } catch (error) {
       console.error('Error adding structure cost:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível adicionar o custo de estrutura.',
         variant: 'destructive',
       });
     }
-  }, [user, selectedYear, toast]);
+  }, [user, selectedYear]);
 
   const removeStructureCost = useCallback(async (month: MonthKey, id: string) => {
     if (!user) return;
@@ -380,19 +382,19 @@ export const useFinanceData = () => {
         },
       }));
 
-      toast({
+      toastRef.current({
         title: 'Sucesso',
         description: 'Custo de estrutura removido com sucesso!',
       });
     } catch (error) {
       console.error('Error removing structure cost:', error);
-      toast({
+      toastRef.current({
         title: 'Erro',
         description: 'Não foi possível remover o custo de estrutura.',
         variant: 'destructive',
       });
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Calculate monthly summary
   const getMonthSummary = useCallback((month: MonthKey): MonthSummary => {
