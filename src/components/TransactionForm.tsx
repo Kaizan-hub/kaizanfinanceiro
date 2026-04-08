@@ -15,7 +15,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Plus, DollarSign, TrendingDown, Settings } from 'lucide-react';
@@ -120,12 +119,10 @@ export const TransactionForm = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nova Transação
-        </Button>
-      </DialogTrigger>
+      <Button className="gap-2" onClick={() => setOpen(true)}>
+        <Plus className="w-4 h-4" />
+        Nova Transação
+      </Button>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Adicionar Transação</DialogTitle>
