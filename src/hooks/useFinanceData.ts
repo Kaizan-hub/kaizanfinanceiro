@@ -42,6 +42,8 @@ export const useFinanceData = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   // Fetch data from database
   const fetchData = useCallback(async () => {
