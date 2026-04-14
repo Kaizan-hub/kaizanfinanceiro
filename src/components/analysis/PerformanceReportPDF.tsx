@@ -286,24 +286,34 @@ export const PerformanceReportPDF = ({
               {/* Pie Chart - Revenue vs Ads */}
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Receita vs Custos</h3>
-                <div className="h-48">
+                <div className="h-64">
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={pieData}
                           cx="50%"
-                          cy="50%"
-                          outerRadius={60}
+                          cy="45%"
+                          outerRadius={55}
                           dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
+                          label={({ name, percent, x, y, midAngle }) => {
+                            const RADIAN = Math.PI / 180;
+                            const radius = 75;
+                            const cx2 = x;
+                            const cy2 = y;
+                            return (
+                              <text x={cx2} y={cy2} textAnchor={midAngle > 180 ? 'end' : 'start'} dominantBaseline="central" fontSize={10} fill="#374151">
+                                {`${name} ${(percent * 100).toFixed(0)}%`}
+                              </text>
+                            );
+                          }}
+                          labelLine={true}
                         >
                           {pieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Legend />
+                        <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (
