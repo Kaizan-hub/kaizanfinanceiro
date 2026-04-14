@@ -304,7 +304,7 @@ export const PerformanceReportPDF = ({
                             const item = pieData.find(d => d.name === name);
                             const labelColor = item?.color || '#374151';
                             return (
-                              <text x={x} y={y} textAnchor={x > (cx as number) ? 'start' : 'end'} dominantBaseline="central" fontSize={9} fill={labelColor} fontWeight="bold">
+                              <text x={x} y={y} textAnchor={x > (cx as number) ? 'start' : 'end'} dominantBaseline="central" fontSize={13} fill={labelColor} fontWeight="bold">
                                 {`${name} ${(percent * 100).toFixed(0)}%`}
                               </text>
                             );
