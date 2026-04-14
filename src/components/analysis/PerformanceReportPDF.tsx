@@ -301,8 +301,10 @@ export const PerformanceReportPDF = ({
                             const radius = (or as number) + 18;
                             const x = (cx as number) + radius * Math.cos(-midAngle * RADIAN);
                             const y = (cy as number) + radius * Math.sin(-midAngle * RADIAN);
+                            const item = pieData.find(d => d.name === name);
+                            const labelColor = item?.color || '#374151';
                             return (
-                              <text x={x} y={y} textAnchor={x > (cx as number) ? 'start' : 'end'} dominantBaseline="central" fontSize={9} fill="#374151">
+                              <text x={x} y={y} textAnchor={x > (cx as number) ? 'start' : 'end'} dominantBaseline="central" fontSize={9} fill={labelColor} fontWeight="bold">
                                 {`${name} ${(percent * 100).toFixed(0)}%`}
                               </text>
                             );
