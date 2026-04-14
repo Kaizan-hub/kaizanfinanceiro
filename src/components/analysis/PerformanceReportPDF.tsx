@@ -285,7 +285,7 @@ export const PerformanceReportPDF = ({
               
               {/* Pie Chart - Revenue vs Ads */}
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Receita vs Gastos com Ads</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Receita vs Custos</h3>
                 <div className="h-48">
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
