@@ -83,7 +83,7 @@ export const PerformanceReportPDF = ({
   const pieData = [
     { name: 'Receita', value: metrics.totalRevenue, color: COLORS.revenue },
     { name: 'Gastos Ads', value: metrics.totalAds, color: COLORS.ads },
-    { name: 'Custos Estrutura', value: metrics.totalStructure, color: COLORS.structure },
+    { name: 'Estrutura', value: metrics.totalStructure, color: COLORS.structure },
   ].filter(d => d.value > 0);
 
   const handleExportPDF = async () => {
