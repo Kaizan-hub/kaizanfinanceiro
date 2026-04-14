@@ -286,34 +286,34 @@ export const PerformanceReportPDF = ({
               {/* Pie Chart - Revenue vs Ads */}
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Receita vs Custos</h3>
-                <div className="h-64">
+                <div className="h-56">
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={pieData}
                           cx="50%"
-                          cy="45%"
-                          outerRadius={55}
+                          cy="40%"
+                          outerRadius={50}
                           dataKey="value"
-                          label={({ name, percent, x, y, midAngle }) => {
-                            const RADIAN = Math.PI / 180;
-                            const radius = 75;
-                            const cx2 = x;
-                            const cy2 = y;
-                            return (
-                              <text x={cx2} y={cy2} textAnchor={midAngle > 180 ? 'end' : 'start'} dominantBaseline="central" fontSize={10} fill="#374151">
-                                {`${name} ${(percent * 100).toFixed(0)}%`}
-                              </text>
-                            );
-                          }}
-                          labelLine={true}
+                          labelLine={false}
                         >
                           {pieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                        <Legend
+                          layout="horizontal"
+                          verticalAlign="bottom"
+                          align="center"
+                          formatter={(value, entry: any) => {
+                            const item = pieData.find(d => d.name === value);
+                            const total = pieData.reduce((s, d) => s + d.value, 0);
+                            const pct = item && total > 0 ? ((item.value / total) * 100).toFixed(0) : '0';
+                            return `${value} ${pct}%`;
+                          }}
+                          wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (
