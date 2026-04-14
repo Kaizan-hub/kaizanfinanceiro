@@ -10,6 +10,7 @@ export type DateFilterType = 'today' | 'last7days' | 'custom';
 interface PerformanceMetrics {
   totalRevenue: number;
   totalAds: number;
+  totalStructure: number;
   netProfit: number;
   roas: number;
   totalClientsServed: number;
@@ -33,6 +34,7 @@ export const usePerformanceAnalysis = (selectedYear: number) => {
   // Data state
   const [entries, setEntries] = useState<{ date: string; value: number }[]>([]);
   const [adExpenses, setAdExpenses] = useState<{ date: string; value: number; clientsServed: number }[]>([]);
+  const [structureCosts, setStructureCosts] = useState<{ date: string; value: number }[]>([]);
   const [performanceNotes, setPerformanceNotes] = useState<DailyPerformanceNote[]>([]);
 
   // Get date range based on filter
@@ -72,14 +74,16 @@ export const usePerformanceAnalysis = (selectedYear: number) => {
 
     setLoading(true);
     try {
-      const [entriesRes, adExpensesRes, notesRes] = await Promise.all([
+      const [entriesRes, adExpensesRes, structureRes, notesRes] = await Promise.all([
         supabase.from('entries').select('date, value').eq('user_id', user.id).eq('year', selectedYear),
         supabase.from('ad_expenses').select('date, value, clients_served').eq('user_id', user.id).eq('year', selectedYear),
+        supabase.from('structure_costs').select('date, value').eq('user_id', user.id).eq('year', selectedYear),
         supabase.from('daily_performance_notes').select('*').eq('user_id', user.id).eq('year', selectedYear),
       ]);
 
       if (entriesRes.error) throw entriesRes.error;
       if (adExpensesRes.error) throw adExpensesRes.error;
+      if (structureRes.error) throw structureRes.error;
       if (notesRes.error) throw notesRes.error;
 
       setEntries(entriesRes.data?.map(e => ({ date: e.date, value: Number(e.value) })) || []);
@@ -88,6 +92,7 @@ export const usePerformanceAnalysis = (selectedYear: number) => {
         value: Number(e.value),
         clientsServed: e.clients_served || 0,
       })) || []);
+      setStructureCosts(structureRes.data?.map(e => ({ date: e.date, value: Number(e.value) })) || []);
       setPerformanceNotes(notesRes.data?.map(n => ({
         id: n.id,
         date: n.date,
@@ -126,9 +131,15 @@ export const usePerformanceAnalysis = (selectedYear: number) => {
       return isWithinInterval(expenseDate, { start, end });
     });
 
+    const filteredStructureCosts = structureCosts.filter(e => {
+      const costDate = parseISO(e.date);
+      return isWithinInterval(costDate, { start, end });
+    });
+
     const totalRevenue = filteredEntries.reduce((sum, e) => sum + e.value, 0);
     const totalAds = filteredAdExpenses.reduce((sum, e) => sum + e.value, 0);
-    const netProfit = totalRevenue - totalAds;
+    const totalStructure = filteredStructureCosts.reduce((sum, e) => sum + e.value, 0);
+    const netProfit = totalRevenue - totalAds - totalStructure;
     const roas = totalAds > 0 ? totalRevenue / totalAds : 0;
     const totalClientsServed = filteredAdExpenses.reduce((sum, e) => sum + e.clientsServed, 0);
     const profitPerLead = totalClientsServed > 0 ? netProfit / totalClientsServed : 0;
@@ -136,12 +147,13 @@ export const usePerformanceAnalysis = (selectedYear: number) => {
     return {
       totalRevenue,
       totalAds,
+      totalStructure,
       netProfit,
       roas,
       totalClientsServed,
       profitPerLead,
     };
-  }, [entries, adExpenses, getDateRange]);
+  }, [entries, adExpenses, structureCosts, getDateRange]);
 
   // Get daily client data for chart
   const dailyClientData: DailyClientData[] = useMemo(() => {
