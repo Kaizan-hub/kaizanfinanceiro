@@ -19,6 +19,7 @@ import {
   Loader2,
   HelpCircle,
   UserCheck,
+  Wrench,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -84,6 +85,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
   const metricCards = [
     { title: 'RECEITA TOTAL', value: formatCurrency(metrics.totalRevenue), icon: <DollarSign className="w-3.5 h-3.5" />, color: '#22c55e', tooltip: 'Soma de todas as receitas no período' },
     { title: 'GASTOS COM ADS', value: formatCurrency(metrics.totalAds), icon: <TrendingDown className="w-3.5 h-3.5" />, color: '#f97316', tooltip: 'Total investido em anúncios (já com imposto se aplicado)' },
+    { title: 'CUSTOS ESTRUTURA', value: formatCurrency(metrics.totalStructure), icon: <Wrench className="w-3.5 h-3.5" />, color: '#8b5cf6', tooltip: 'Ferramentas, assinaturas, plataformas e outros custos fixos' },
     { title: 'ROAS', value: `${metrics.roas.toFixed(2)}x`, icon: <Target className="w-3.5 h-3.5" />, color: '#a78bfa', tooltip: 'Receita ÷ Gastos com Ads' },
     { title: 'CUSTO POR LEAD', value: formatCurrency(costPerLead), icon: <UserCheck className="w-3.5 h-3.5" />, color: '#f97316', tooltip: 'Gastos com Ads ÷ Clientes Atendidos' },
   ];
@@ -183,7 +185,7 @@ export const PerformanceTab = ({ selectedYear, availableYears, onSelectYear }: P
       </motion.div>
 
       {/* 4 Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
         {metricCards.map((card, index) => (
           <motion.div key={card.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + index * 0.06 }}>

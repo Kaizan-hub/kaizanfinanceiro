@@ -19,6 +19,7 @@ import {
   Lightbulb,
   Star,
   BarChart3,
+  Wrench,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
@@ -26,6 +27,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieCha
 interface PerformanceMetrics {
   totalRevenue: number;
   totalAds: number;
+  totalStructure: number;
   netProfit: number;
   roas: number;
   totalClientsServed: number;
@@ -61,6 +63,7 @@ const formatCurrency = (value: number) => {
 const COLORS = {
   revenue: '#10b981',
   ads: '#f59e0b',
+  structure: '#8b5cf6',
   profit: '#22c55e',
   clients: '#FF5C00',
 };
@@ -80,6 +83,7 @@ export const PerformanceReportPDF = ({
   const pieData = [
     { name: 'Receita', value: metrics.totalRevenue, color: COLORS.revenue },
     { name: 'Gastos Ads', value: metrics.totalAds, color: COLORS.ads },
+    { name: 'Custos Estrutura', value: metrics.totalStructure, color: COLORS.structure },
   ].filter(d => d.value > 0);
 
   const handleExportPDF = async () => {
@@ -168,14 +172,14 @@ export const PerformanceReportPDF = ({
               <span className="w-8 h-1 bg-[#FF5C00]"></span>
               Métricas Principais
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {/* Revenue */}
               <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-lg border-2 border-emerald-200">
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-5 h-5 text-emerald-600" />
                   <span className="text-sm text-gray-600 font-medium">Receita Total</span>
                 </div>
-                <p className="text-2xl font-bold text-emerald-700">{formatCurrency(metrics.totalRevenue)}</p>
+                <p className="text-xl font-bold text-emerald-700">{formatCurrency(metrics.totalRevenue)}</p>
               </div>
               
               {/* Ad Spend */}
@@ -184,7 +188,16 @@ export const PerformanceReportPDF = ({
                   <TrendingDown className="w-5 h-5 text-amber-600" />
                   <span className="text-sm text-gray-600 font-medium">Gastos com Ads</span>
                 </div>
-                <p className="text-2xl font-bold text-amber-700">{formatCurrency(metrics.totalAds)}</p>
+                <p className="text-xl font-bold text-amber-700">{formatCurrency(metrics.totalAds)}</p>
+              </div>
+
+              {/* Structure Costs */}
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-2 border-purple-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Wrench className="w-5 h-5 text-purple-600" />
+                  <span className="text-sm text-gray-600 font-medium">Custos Estrutura</span>
+                </div>
+                <p className="text-xl font-bold text-purple-700">{formatCurrency(metrics.totalStructure)}</p>
               </div>
               
               {/* Net Profit */}
@@ -199,7 +212,7 @@ export const PerformanceReportPDF = ({
                   <span className="text-sm text-gray-600 font-medium">Lucro Líquido</span>
                 </div>
                 <p className={cn(
-                  "text-2xl font-bold",
+                  "text-xl font-bold",
                   metrics.netProfit >= 0 ? "text-green-700" : "text-red-700"
                 )}>
                   {formatCurrency(metrics.netProfit)}
@@ -212,7 +225,7 @@ export const PerformanceReportPDF = ({
                   <Users className="w-5 h-5 text-[#FF5C00]" />
                   <span className="text-sm text-gray-600 font-medium">Clientes/Leads</span>
                 </div>
-                <p className="text-2xl font-bold text-[#FF5C00]">{metrics.totalClientsServed}</p>
+                <p className="text-xl font-bold text-[#FF5C00]">{metrics.totalClientsServed}</p>
               </div>
             </div>
             
@@ -272,7 +285,7 @@ export const PerformanceReportPDF = ({
               
               {/* Pie Chart - Revenue vs Ads */}
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Receita vs Gastos com Ads</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Receita vs Custos</h3>
                 <div className="h-48">
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
